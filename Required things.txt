@@ -1,0 +1,51 @@
+Required things
+so again I am giving you the main things in our project so once cross check and verify all things are there according to this or not. if not then update the codes accordingly:
+
+You will evaluate:(metrics we discussed which shown to user and build strong in research level also)
+
+Patient comprehension
+
+Readability (FKGL)
+
+Information coverage
+
+Trust calibration
+
+Agent disagreement rate
+
+📌 This makes your work:
+
+empirical + reproducible
+
+That alone places you in a different journal category.
+
+
+Implementation Requirements(models and tools we thought to use)
+🔧 Models
+
+Primary LLM: BioGPT
+
+No fine-tuning required (contrast with classmates)
+
+Prompt-based specialization
+
+🔧 Tools
+
+Python
+
+LangChain / CrewAI
+
+JSON-based outputs
+
+Public clinical datasets (MIMIC-III )
+
+
+
+| Agent                              | Visible to User?          | Why                        |
+| ---------------------------------- | ------------------------- | -------------------------- |
+| Clinical Interpretation            | ❌ (internal)              | Too technical              |
+| Risk Assessment                    | ❌ (internal / summarized) | Avoid fear                 |
+| Explainability Agent               | ✅                         | Core patient understanding and it shuld how risk also(low/medium/high).|
+| Recommendation Agent               | ❌ (internal only)         | Raw actions lack context   |
+| Recommendation Justification Agent | ✅                         | Makes recommendations safe |
+| Verification Agent                 | ✅ (summary only)          | Builds trust               |

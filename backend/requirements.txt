@@ -1,0 +1,10 @@
+transformers
+torch>=2.6.0
+accelerate
+bitsandbytes
+protobuf
+fastapi
+uvicorn
+pandas
+textstat
+langchain-core

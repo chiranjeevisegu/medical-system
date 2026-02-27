@@ -1,0 +1,80 @@
+# Medical Agentic System Architecture
+
+This document describes the high-level architecture of the Explainable Multi-Agent Medical Report Understanding System.
+
+## Architecture Diagram
+
+```mermaid
+graph TD
+    %% Users and API Layer
+    User((User / Dashboard)) <--> |HTTP GET / POST| FastAPI[FastAPI App / main.py]
+
+    %% Data Sources
+    subgraph Data Layer
+        CSV_NOTEEVENTS[(NOTEEVENTS.csv)]
+        CSV_DIAGNOSES[(DIAGNOSES_ICD.csv)]
+        CSV_LABEVENTS[(LABEVENTS.csv)]
+    end
+
+    %% Data Loading
+    CSV_NOTEEVENTS --> DataLoader[MIMICDatasetLoader]
+    CSV_DIAGNOSES --> DataLoader
+    CSV_LABEVENTS --> DataLoader
+    
+    DataLoader --> EnrichedReport[Enriched Report State]
+    
+    %% Model Manager
+    subgraph Local LLM Ecosystem
+        FlanT5{{google/flan-t5-large}}
+        BioGPT{{microsoft/biogpt}}
+        BioClinicalBERT{{BioClinicalBERT Classifier}}
+    end
+
+    %% Orchestrator & Agents
+    FastAPI --> Orchestrator[Orchestrator]
+    Orchestrator --> Flow[SequentialAgentFlow]
+    EnrichedReport -.-> Flow
+    FlanT5 -.-> Flow
+    BioGPT -.-> Flow
+    BioClinicalBERT -.-> Flow
+    
+    subgraph Multi-Agent Pipeline
+        direction TB
+        A1(ClinicalAgent) --> |clinical_summary| A2(RiskAgent)
+        A2 --> |risk| A3(ExplainabilityAgent)
+        A3 --> |explanation| A4(VerificationAgent<br/>Pre-Verification)
+        A4 --> |verification_preliminary<br/>confidence_gate| A5(RecommendationAgent)
+        A5 --> |recommendation| A6(JustificationAgent)
+        A6 --> |justification| A7(VerificationAgent<br/>Final Verification)
+    end
+    
+    Flow --> Multi-AgentPipeline
+    Multi-AgentPipeline --> FinalState[Final Validated State]
+    
+    %% Evaluation
+    subgraph Evaluation
+        Eval[Evaluator]
+        Baseline[BaselineSummarizer]
+    end
+    
+    FastAPI --> |/evaluate| Eval
+    Eval --> Baseline
+    FinalState --> Eval
+    Eval --> Results[(results.csv)]
+    
+    FinalState --> FastAPI
+```
+
+## Component Details
+
+1. **FastAPI ([main.py](file:///c:/Users/chira/OneDrive/Desktop/medical-agentic-system/backend/main.py))**: The primary entry point exposing REST endpoints (`/cases`, `/analyze/{case_id}`, `/evaluate`) and the dashboard UI.
+2. **Dataset Loader ([dataset_loader.py](file:///c:/Users/chira/OneDrive/Desktop/medical-agentic-system/backend/dataset_loader.py))**: Merges multiple MIMIC-III data sources (`NOTEEVENTS`, `DIAGNOSES_ICD`, `LABEVENTS`) into an enriched data context.
+3. **Orchestrator ([orchestrator.py](file:///c:/Users/chira/OneDrive/Desktop/medical-agentic-system/backend/orchestrator.py))**: Manages the SequentialAgentFlow, running sequential inference steps across the multi-agent pipeline while applying strict state validation.
+4. **Agents**:
+   - **ClinicalAgent**: Extracts diseases, findings, and key observations, combined with the BioClinicalBERT classification.
+   - **RiskAgent**: Computes risk levels.
+   - **ExplainabilityAgent**: Creates patient-friendly plain-language summaries.
+   - **RecommendationAgent**: Generates actionable next steps depending on pre-verification confidence.
+   - **JustificationAgent**: Justifies the given recommendations based on risk and explanations.
+   - **VerificationAgent**: Checks for contradictions and enforces safety guidelines, both midway and at the end of the flow.
+5. **Evaluator ([evaluation.py](file:///c:/Users/chira/OneDrive/Desktop/medical-agentic-system/backend/evaluation.py))**: Re-runs the baseline over the entire dataset to compare agent generation vs local baselines and assesses FKGL (readability), word count, QA scores, and metrics.

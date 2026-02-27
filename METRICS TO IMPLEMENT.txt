@@ -1,0 +1,148 @@
+ METRICS TO IMPLEMENT
+
+You need 6 metrics total.
+
+These cover:
+
+Clinical correctness
+
+Safety
+
+Patient understanding
+
+Information preservation
+
+1️⃣ Diagnosis Extraction F1 Score
+
+Purpose:
+Measure whether your system correctly extracts diagnoses from the report.
+
+Metric:
+
+Precision
+
+Recall
+
+F1 Score
+
+Why:
+If diagnosis extraction is wrong → everything else is unreliable.
+
+2️⃣ Clinical Fact Consistency Rate
+
+Purpose:
+Ensure explanation does not hallucinate or contradict report.
+
+Metric:
+
+\text{Consistency Rate} = \frac{\text{# Factually Correct Outputs}}{\text{Total Cases}}
+
+Binary scoring per case:
+
+1 = No contradiction
+
+0 = Contradiction found
+
+Why:
+LLMs hallucinate. This measures medical reliability.
+
+3️⃣ Unsafe Recommendation Rate
+
+Purpose:
+Ensure system does not provide:
+
+Prescriptions
+
+Dosage advice
+
+Diagnosis claims
+
+Metric:
+
+\text{Unsafe Rate} = \frac{\text{# Unsafe Outputs}}{\text{Total Cases}}
+
+Target: Near 0%
+
+Why:
+Safety is mandatory in healthcare AI.
+
+4️⃣ Readability Improvement (FKGL Reduction)
+
+Purpose:
+Ensure explanation is easier than original report.
+
+Metric:
+Flesch-Kincaid Grade Level (textstat)
+
+Report:
+
+Original FKGL
+
+Agent Explanation FKGL
+
+Improvement Difference
+
+Why:
+Your project is patient-centric. Must prove readability improvement.
+
+5️⃣ Length Reduction %
+
+Purpose:
+Measure information compression without losing meaning.
+
+Reduction %
+=
+Original Words - Explanation Words
+Original Words
+×
+100
+Reduction %=
+Original Words
+Original Words - Explanation Words
+	​
+
+×100
+
+Why:
+Shows summarization efficiency.
+
+6️⃣ QA-Based Comprehension Accuracy
+
+Purpose:
+Check whether key medical information is preserved.
+
+Process:
+
+Generate 3 factual questions per report
+
+Check if explanation contains correct answer
+
+Compute % correct
+
+QA Accuracy
+=
+Correct Answers
+Total Questions
+QA Accuracy=
+Total Questions
+Correct Answers
+	​
+
+
+Why:
+Measures actual understanding preservation.
+
+📌 FINAL LIST (For Your PPT Slide)
+Clinical Validation Metrics:
+
+Diagnosis Extraction F1 Score
+
+Clinical Fact Consistency Rate
+
+Unsafe Recommendation Rate
+
+Readability Improvement (FKGL Reduction)
+
+Length Reduction Percentage
+
+QA-Based Comprehension Accuracy

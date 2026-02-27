@@ -1,0 +1,324 @@
+🏥 FINAL METHODOLOGY
+Hybrid Clinical–Reasoning Multi-Agent Architecture
+1️⃣ System Overview
+
+We propose a Hybrid Multi-Agent Clinical Understanding System that separates:
+
+Clinical domain grounding
+
+Patient-centric reasoning and explanation
+
+Safety-controlled recommendation generation
+
+Instead of using a single monolithic LLM, the system is divided into structured layers, each handled by a specialized model.
+
+The architecture integrates:
+
+BioClinicalBERT → Clinical representation & classification
+
+FLAN-T5-Large → Reasoning, explanation, recommendation, and safety validation
+
+This separation improves:
+
+Clinical accuracy
+
+Interpretability
+
+Safety control
+
+Modular evaluation
+
+2️⃣ Data Layer – Clinical Report Processing
+Dataset
+
+MIMIC-III Discharge Summaries
+
+Source: NOTEEVENTS.csv
+
+Filter: CATEGORY = "Discharge summary"
+
+Preprocessing
+
+Text cleaning
+
+Removal of formatting artifacts
+
+Token truncation to 512 tokens (for BERT)
+
+No model operates in this layer.
+It ensures standardized clinical text input.
+
+3️⃣ Clinical Representation Layer
+Model: BioClinicalBERT
+
+HuggingFace ID: emilyalsentzer/Bio_ClinicalBERT
+
+Purpose
+
+This layer extracts domain-grounded representations of clinical text.
+
+Processing Steps
+
+Discharge summary → Tokenization
+
+Passed through BioClinicalBERT encoder
+
+Extract [CLS] embedding (768-dimensional clinical feature vector)
+
+This embedding captures:
+
+Clinical terminology
+
+Contextual relationships
+
+Disease-specific patterns
+
+Medical phrasing unique to MIMIC-III
+
+Why BioClinicalBERT?
+
+Pretrained directly on MIMIC-III clinical notes
+
+Domain-aligned language modeling
+
+Lightweight (BERT-base architecture)
+
+CPU compatible
+
+Strong for classification tasks
+
+4️⃣ Clinical Classification Layer
+Lightweight Supervised Classification Head
+
+A linear classification layer is added on top of BioClinicalBERT’s CLS embedding.
+
+Architecture
+
+CLS embedding (768-dim)
+→ Fully Connected Layer
+→ Softmax
+→ Disease Category
+
+Categories (Example)
+
+Cardiovascular
+
+Respiratory
+
+Endocrine
+
+Infectious
+
+Neurological
+
+Training Configuration
+
+Loss: CrossEntropyLoss
+
+Optimizer: AdamW
+
+Epochs: 5–10
+
+Batch size: 8–16
+
+Evaluation: Precision, Recall, F1-score
+
+Output
+
+Predicted disease category
+
+Confidence score
+
+Purpose
+
+Provides structured, clinically grounded signals for downstream reasoning agents.
+
+This converts unstructured text into structured clinical representation.
+
+5️⃣ Clinical Interpretation & Reasoning Layer
+Model: FLAN-T5-Large
+
+HuggingFace ID: google/flan-t5-large
+
+FLAN-T5 is an instruction-tuned sequence-to-sequence model used for all generative reasoning tasks.
+
+This layer contains multiple agents.
+
+🔹 Agent 1 – Risk Assessment Agent
+
+Input: Disease class + clinical summary
+Model: FLAN-T5
+
+Task:
+
+Assign risk level (Low / Medium / High)
+
+Provide structured reasoning
+
+Why FLAN?
+
+Instruction-following capability
+
+Controlled structured output
+
+🔹 Agent 2 – Explainability Agent
+
+Input: Clinical findings
+
+Task:
+
+Translate medical terminology into patient-understandable language
+
+Remove jargon
+
+Explain physiological implications
+
+Goal:
+Patient-centric clarity.
+
+🔹 Agent 3 – Recommendation Agent
+
+Input: Explanation + Risk level
+
+Task:
+Generate non-diagnostic, safe suggestions:
+
+Doctor consultation
+
+Lifestyle monitoring
+
+Follow-up testing
+
+Observation
+
+Constraints:
+
+No prescriptions
+
+No dosage
+
+No definitive diagnosis
+
+FLAN is ideal here because it follows safety prompts effectively.
+
+🔹 Agent 4 – Justification Agent
+
+Input: Recommendation
+
+Task:
+
+Explain why action is suggested
+
+Provide confidence score
+
+State uncertainty and limitations
+
+This improves transparency and trust.
+
+🔹 Agent 5 – Verification Agent
+
+Task:
+
+Detect contradictions
+
+Identify unsafe content
+
+Validate internal consistency
+
+Outputs:
+
+Consistency flag
+
+Safety flag
+
+This agent acts as a guardrail layer.
+
+6️⃣ Baseline System
+
+To compare architecture effectiveness, we implement a baseline:
+
+Single-prompt summarization using FLAN-T5.
+
+This baseline allows evaluation of:
+
+Multi-agent benefit
+
+Safety improvement
+
+Readability improvement
+
+7️⃣ Evaluation Methodology
+
+We evaluate on 20 MIMIC-III discharge summaries.
+
+Clinical Classification Metrics
+
+Precision
+
+Recall
+
+F1-score
+
+Measures performance of BioClinicalBERT classification layer.
+
+Reasoning & Safety Metrics
+
+Clinical Fact Consistency Rate
+
+Unsafe Recommendation Rate
+
+Flesch-Kincaid Readability Reduction
+
+Length Reduction Percentage
+
+QA-Based Comprehension Accuracy
+
+All metrics stored in:
+backend/results.csv
+
+8️⃣ Why This Hybrid Architecture Is Scientifically Strong
+
+This design:
+
+Separates domain grounding from reasoning
+
+Introduces supervised measurable clinical layer
+
+Controls patient-facing generation
+
+Adds safety verification
+
+Enables layer-wise evaluation
+
+Unlike monolithic LLM systems, this architecture allows:
+
+Component-level debugging
+
+Ablation studies
+
+Safety isolation
+
+Better interpretability
+
+9️⃣ Implementation Summary
+Layer	Model	Responsibility
+Representation	BioClinicalBERT	Clinical encoding
+Classification	Linear head	Disease category prediction
+Risk	FLAN-T5	Risk reasoning
+Explainability	FLAN-T5	Patient explanation
+Recommendation	FLAN-T5	Safe action generation
+Justification	FLAN-T5	Transparency
+Verification	FLAN-T5	Safety & consistency
+🔥 Final Contribution Statement
+
+The proposed system introduces:
+
+A hybrid domain-grounded + instruction-controlled architecture
+
+Supervised clinical classification integrated with generative reasoning
+
+Multi-agent safety-controlled recommendation design
+
+Quantitative validation across clinical and readability metrics
+
+This design improves clinical reliability while maintaining patient accessibility.
