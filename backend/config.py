@@ -34,7 +34,7 @@ class Settings:
     allow_biomedical_fallback: bool = _env_bool("ALLOW_BIOMEDICAL_FALLBACK", False)
     use_gpu_if_available: bool = _env_bool("USE_GPU_IF_AVAILABLE", True)
     use_fp16_on_gpu: bool = _env_bool("USE_FP16_ON_GPU", True)
-    classifier_epochs: int = int(os.getenv("CLASSIFIER_EPOCHS", "6"))
+    classifier_epochs: int = int(os.getenv("CLASSIFIER_EPOCHS", "7"))
     classifier_force_retrain: bool = _env_bool("CLASSIFIER_FORCE_RETRAIN", False)
     classifier_batch_size: int = int(os.getenv("CLASSIFIER_BATCH_SIZE", "8"))
 

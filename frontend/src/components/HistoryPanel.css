@@ -1,0 +1,167 @@
+/* ── History Section ─────────────────────────────────────────── */
+.history-section {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    padding: 28px;
+}
+
+.history-section-header {
+    margin-bottom: 20px;
+}
+
+.history-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.history-title-row h2 {
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.history-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-count-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: var(--accent-dim);
+    color: var(--accent);
+}
+
+.history-clear-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: #f87171;
+    font-size: 0.72rem;
+    padding: 4px 12px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: var(--transition);
+}
+
+.history-clear-btn:hover {
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.history-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── Empty State ─────────────────────────────────────────────── */
+.history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border);
+    text-align: center;
+}
+
+.history-empty-icon {
+    font-size: 2.2rem;
+    opacity: 0.6;
+}
+
+.history-empty p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    max-width: 400px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.history-empty strong {
+    color: var(--text-secondary);
+}
+
+/* ── History Grid ─────────────────────────────────────────────── */
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+/* ── History Card ─────────────────────────────────────────────── */
+.history-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.12);
+}
+
+.hcard-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hcard-risk {
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.hcard-time {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.hcard-category {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.hcard-conf {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.hcard-preview {
+    font-size: 0.79rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    margin: 0;
+}
+
+.hcard-cta {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 2px;
+}

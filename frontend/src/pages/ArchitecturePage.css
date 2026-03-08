@@ -1,0 +1,132 @@
+.tech-stack {
+    margin-bottom: 32px;
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.tech-card {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: var(--transition);
+}
+
+.tech-card:hover {
+    transform: translateY(-2px);
+}
+
+.tech-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.tech-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.pipeline-heading {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.pipeline-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.pipeline-step {
+    display: flex;
+    gap: 20px;
+    position: relative;
+}
+
+.step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 52px;
+}
+
+.step-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+    position: relative;
+    background: var(--bg-secondary);
+}
+
+.step-icon {
+    font-size: 1.25rem;
+}
+
+.connector-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(to bottom, var(--border), transparent);
+    min-height: 32px;
+    margin: 4px 0;
+}
+
+.step-body {
+    flex: 1;
+    padding-bottom: 28px;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.step-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.step-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.step-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 6px;
+}
+
+.step-detail {
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    color: var(--text-muted);
+    background: var(--bg-secondary);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}

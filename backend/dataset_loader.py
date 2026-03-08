@@ -193,18 +193,24 @@ class MIMICDatasetLoader:
                 sample["diagnosis_context"] = []
                 sample["lab_context"] = []
                 sample["lab_context_text"] = ""
+                sample["medications_context"] = []
+                sample["medications_context_text"] = ""
             return
 
         diagnosis_map = self._load_diagnosis_context_map(hadm_ids)
         lab_map = self._load_lab_context_map(hadm_ids)
+        prescriptions_map = self._load_prescriptions_map(hadm_ids)
 
         for sample in samples:
             hadm = str(sample.get("hadm_id", "")).strip()
             diagnoses = diagnosis_map.get(hadm, [])
             labs = lab_map.get(hadm, [])
+            meds = prescriptions_map.get(hadm, [])
             sample["diagnosis_context"] = diagnoses
             sample["lab_context"] = labs
             sample["lab_context_text"] = self._build_lab_context_text(labs)
+            sample["medications_context"] = meds
+            sample["medications_context_text"] = self._build_medications_context_text(meds)
 
     def _attach_previous_reports(self, samples: list[dict]) -> None:
         by_subject: dict[str, list[dict]] = {}
@@ -359,6 +365,53 @@ class MIMICDatasetLoader:
                 parts.append(f"time {time}")
             lines.append(", ".join(parts))
         return " | ".join(lines)
+
+    def _load_prescriptions_map(self, hadm_ids: set[str]) -> dict[str, list[dict]]:
+        """Read PRESCRIPTIONS.csv and return a map of hadm_id -> list of medication dicts."""
+        prescriptions_path = self.dataset_dir / "PRESCRIPTIONS.csv"
+        if not prescriptions_path.exists():
+            return {hadm: [] for hadm in hadm_ids}
+
+        med_map: dict[str, list[dict]] = {hadm: [] for hadm in hadm_ids}
+        try:
+            chunk_iter = pd.read_csv(prescriptions_path, chunksize=25000, low_memory=False)
+            for chunk in chunk_iter:
+                cols = {c.lower(): c for c in chunk.columns}
+                hadm_col = cols.get("hadm_id")
+                drug_col = cols.get("drug")
+                route_col = cols.get("route")
+                start_col = cols.get("startdate") or cols.get("starttime")
+                if not hadm_col or not drug_col:
+                    continue
+
+                chunk_filtered = chunk[chunk[hadm_col].astype(str).isin(hadm_ids)]
+                for _, row in chunk_filtered.iterrows():
+                    hadm = str(row.get(hadm_col, "")).strip()
+                    if not hadm:
+                        continue
+                    if len(med_map[hadm]) >= 10:
+                        continue
+                    drug = self._clean_text(row.get(drug_col))
+                    route = self._clean_text(row.get(route_col)) if route_col else ""
+                    start = self._safe_value(row.get(start_col)) if start_col else None
+                    if drug:
+                        med_map[hadm].append({"drug": drug, "route": route, "start": start})
+        except Exception:  # noqa: BLE001
+            pass  # PRESCRIPTIONS.csv missing or malformed – return empty maps
+        return med_map
+
+    @staticmethod
+    def _build_medications_context_text(meds: list[dict]) -> str:
+        """Format medications list as a compact pipe-separated string."""
+        if not meds:
+            return ""
+        parts: list[str] = []
+        for med in meds[:10]:
+            drug = str(med.get("drug", "")).strip()
+            route = str(med.get("route", "")).strip()
+            if drug:
+                parts.append(f"{drug} ({route})" if route else drug)
+        return " | ".join(parts)
 
     @staticmethod
     def _normalize_icd_code(value: object) -> str:

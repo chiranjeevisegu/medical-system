@@ -12,6 +12,12 @@ from backend.config import Settings
 from backend.dataset_loader import MIMICDatasetLoader
 from backend.langchain_orchestration import SequentialAgentFlow
 from backend.model_loader import ensure_clinical_classifier
+from backend.utils.logger import get_logger
+from backend.utils.output_validator import contains_placeholder, validate_final_output
+from backend.utils.schema import build_final_output
+from backend.utils.text_cleaner import clean_report_text
+
+logger = get_logger(__name__)
 
 
 class Orchestrator:
@@ -40,6 +46,7 @@ class Orchestrator:
                 self._step_pre_verification,
                 self._step_recommendation_and_justification,
                 self._step_final_verification,
+                self._step_build_final_output,
                 self._step_user_visible,
             ]
         )
@@ -54,16 +61,19 @@ class Orchestrator:
         return case
 
     def analyze_case(self, case_id: str) -> dict[str, Any]:
+        logger.info("Pipeline start – case_id=%s", case_id)
         case = self.get_case(case_id)
         report_text = str(case.get("report_text", ""))
         diagnosis_context = case.get("diagnosis_context", [])
         lab_context = case.get("lab_context", [])
         lab_context_text = str(case.get("lab_context_text", ""))
+        medications_context_text = str(case.get("medications_context_text", "") or "")
         previous_report_text = str(case.get("previous_report_text", "") or "")
         enriched_report_text = self._build_enriched_report_text(
             report_text=report_text,
             diagnosis_context=diagnosis_context,
             lab_context_text=lab_context_text,
+            medications_context_text=medications_context_text,
         )
 
         state: dict[str, Any] = {"case_id": case_id}
@@ -76,6 +86,7 @@ class Orchestrator:
             "noteevents_report_used": bool(report_text.strip()),
             "diagnoses_icd_used": bool(diagnosis_context),
             "labevents_used": bool(lab_context),
+            "medications_used": bool(medications_context_text.strip()),
             "diagnosis_items_count": len(diagnosis_context),
             "lab_items_count": len(lab_context),
         }
@@ -84,19 +95,71 @@ class Orchestrator:
         final_state = self.flow.run(state)
         if self.settings.strict_agent_validation:
             self._validate_state(final_state)
+        logger.info("Pipeline complete – case_id=%s", case_id)
         return final_state
+
+    def analyze_report_text(self, report_text: str) -> dict[str, Any]:
+        """Run the full 6-agent pipeline on freeform report text (no MIMIC case required).
+
+        This is the entry point used by the React frontend via POST /analyze_report.
+        """
+        import uuid  # noqa: PLC0415
+        case_id = f"web_{uuid.uuid4().hex[:8]}"
+        logger.info("analyze_report_text: case_id=%s chars=%d", case_id, len(report_text))
+
+        # Strip MIMIC anonymization tokens before any agent sees the text
+        cleaned_text = clean_report_text(report_text)
+        logger.debug("analyze_report_text: cleaned to %d chars", len(cleaned_text))
+
+        enriched = self._build_enriched_report_text(
+            report_text=cleaned_text,
+            diagnosis_context=[],
+            lab_context_text="",
+            medications_context_text="",
+        )
+
+        state: dict[str, Any] = {"case_id": case_id}
+        state["dataset_context"] = {"diagnosis_context": [], "lab_context": []}
+        state["data_sources_used"] = {
+            "report_source": "web_input",
+            "noteevents_report_used": True,
+            "diagnoses_icd_used": False,
+            "labevents_used": False,
+            "medications_used": False,
+            "diagnosis_items_count": 0,
+            "lab_items_count": 0,
+        }
+        state["report_text_enriched"] = enriched
+        state["previous_report_text"] = ""
+
+        final_state = self.flow.run(state)
+
+        # Build and return the structured final output
+        from backend.utils.schema import build_final_output  # noqa: PLC0415
+        return build_final_output(
+            clinical_summary=final_state.get("clinical_summary", {}),
+            risk=final_state.get("risk", {}),
+            explanation=final_state.get("explanation", {}),
+            recommendation=final_state.get("recommendation", {}),
+            justification=final_state.get("justification", {}),
+            verification=final_state.get("verification", {}),
+        )
+
 
     @staticmethod
     def _build_enriched_report_text(
         report_text: str,
         diagnosis_context: list[Any],
         lab_context_text: str,
+        medications_context_text: str = "",
     ) -> str:
         parts = [f"DISCHARGE_SUMMARY:\n{report_text}"]
         if diagnosis_context:
             parts.append(f"DIAGNOSES_ICD_CONTEXT:\n{'; '.join(str(x) for x in diagnosis_context)}")
         if lab_context_text:
             parts.append(f"LABEVENTS_CONTEXT:\n{lab_context_text}")
+        if medications_context_text:
+            parts.append(f"MEDICATIONS_CONTEXT:\n{medications_context_text}")
         return "\n\n".join(parts)
 
     @staticmethod
@@ -128,19 +191,27 @@ class Orchestrator:
         }
 
     def _step_clinical(self, state: dict[str, Any]) -> dict[str, Any]:
+        logger.info("Step clinical_agent – case_id=%s", state.get("case_id", "?"))
         state["clinical_summary"] = self.clinical_agent.run(state["report_text_enriched"])
+        logger.info("clinical_agent done – category=%s conf=%.2f",
+            state["clinical_summary"].get("disease_category"),
+            state["clinical_summary"].get("disease_confidence", 0.0))
         return state
 
     def _step_risk(self, state: dict[str, Any]) -> dict[str, Any]:
+        logger.info("Step risk_agent – case_id=%s", state.get("case_id", "?"))
         state["risk"] = self.risk_agent.run(
             state["report_text_enriched"], state["clinical_summary"]
         )
+        logger.info("risk_agent done – risk_level=%s", state["risk"].get("risk_level"))
         return state
 
     def _step_explainability(self, state: dict[str, Any]) -> dict[str, Any]:
+        logger.info("Step explainability_agent – case_id=%s", state.get("case_id", "?"))
         state["explanation"] = self.explainability_agent.run(
             state["report_text_enriched"], state["clinical_summary"], state["risk"]
         )
+        logger.info("explainability_agent done")
         return state
 
     def _step_pre_verification(self, state: dict[str, Any]) -> dict[str, Any]:
@@ -160,6 +231,8 @@ class Orchestrator:
             state["verification_preliminary"].get("consistency_score", 0.0)
         )
         state["recommendation_mode"] = "low_confidence" if confidence_gate < 0.55 else "normal"
+        logger.info("Step recommendation+justification – mode=%s case_id=%s",
+            state["recommendation_mode"], state.get("case_id", "?"))
 
         state["recommendation"] = self.recommendation_agent.run(
             state["report_text_enriched"], state["clinical_summary"], state["risk"]
@@ -167,6 +240,7 @@ class Orchestrator:
         state["justification"] = self.justification_agent.run(
             state["recommendation"], state["explanation"], state["risk"]
         )
+        logger.info("recommendation+justification done")
         return state
 
     def _step_final_verification(self, state: dict[str, Any]) -> dict[str, Any]:
@@ -181,6 +255,83 @@ class Orchestrator:
 
     def _step_user_visible(self, state: dict[str, Any]) -> dict[str, Any]:
         state["user_visible"] = self._build_user_visible_output(state)
+        return state
+
+    def _step_build_final_output(self, state: dict[str, Any]) -> dict[str, Any]:
+        state["final_output"] = build_final_output(
+            clinical_summary=state.get("clinical_summary", {}),
+            risk=state.get("risk", {}),
+            explanation=state.get("explanation", {}),
+            recommendation=state.get("recommendation", {}),
+            justification=state.get("justification", {}),
+            verification=state.get("verification", {}),
+        )
+        ok, issues = validate_final_output(state["final_output"])
+        if not ok:
+            logger.warning("Validation failed (attempt 1) – issues=%s – case_id=%s regenerating…",
+                issues, state.get("case_id", "?"))
+            # One explicit regeneration pass at orchestration level.
+            state["recommendation"] = self.recommendation_agent.run(
+                state["report_text_enriched"], state["clinical_summary"], state["risk"]
+            )
+            state["justification"] = self.justification_agent.run(
+                state["recommendation"], state["explanation"], state["risk"]
+            )
+            state["verification"] = self.verification_agent.run(
+                state["clinical_summary"],
+                state["risk"],
+                state["explanation"],
+                state["recommendation"],
+                state["justification"],
+            )
+            state["final_output"] = build_final_output(
+                clinical_summary=state.get("clinical_summary", {}),
+                risk=state.get("risk", {}),
+                explanation=state.get("explanation", {}),
+                recommendation=state.get("recommendation", {}),
+                justification=state.get("justification", {}),
+                verification=state.get("verification", {}),
+            )
+
+        ok, issues2 = validate_final_output(state["final_output"])
+        if not ok:
+            logger.warning("Validation failed (attempt 2) – issues=%s – case_id=%s applying safety net",
+                issues2, state.get("case_id", "?"))
+            # Deterministic final safety net to avoid missing/placeholder fields.
+            recommendation = state["final_output"].get("recommendation", {})
+            safe_next = recommendation.get("safe_next_steps", [])
+            if not isinstance(safe_next, list) or not safe_next or contains_placeholder(safe_next):
+                recommendation["safe_next_steps"] = [
+                    "Schedule follow-up with your clinician within a few days.",
+                    "Track symptoms daily and report worsening changes.",
+                    "Complete the follow-up tests listed in your discharge plan.",
+                ]
+            urgent = recommendation.get("urgent_attention_signs", [])
+            if not isinstance(urgent, list) or len(urgent) < 2 or contains_placeholder(urgent):
+                recommendation["urgent_attention_signs"] = [
+                    "Seek urgent care for breathing difficulty, confusion, or persistent fever.",
+                    "Seek emergency help for chest pain, fainting, or sudden severe weakness.",
+                ]
+            recommendation["boundaries"] = "Non-diagnostic guidance only; clinician confirmation required."
+            state["final_output"]["recommendation"] = recommendation
+
+            justification = state["final_output"].get("justification", {})
+            rationale = justification.get("rationale", [])
+            if not isinstance(rationale, list) or len([x for x in rationale if str(x).strip()]) < 2 or contains_placeholder(rationale):
+                justification["rationale"] = [
+                    "Recommendations prioritize early detection of worsening symptoms.",
+                    "Close follow-up is advised because complications can progress quickly.",
+                ]
+            limitations = justification.get("limitations", [])
+            if not isinstance(limitations, list) or not limitations:
+                limitations = ["Guidance is based on report summary and must be confirmed clinically."]
+            justification["limitations"] = limitations
+            try:
+                confidence = float(justification.get("confidence", 0.6))
+            except Exception:
+                confidence = 0.6
+            justification["confidence"] = max(0.0, min(1.0, confidence))
+            state["final_output"]["justification"] = justification
         return state
 
     @staticmethod
@@ -238,3 +389,8 @@ class Orchestrator:
 
         if issues:
             raise RuntimeError("Strict agent validation failed: " + "; ".join(issues))
+
+        final_output = state.get("final_output", {})
+        ok_final, final_issues = validate_final_output(final_output if isinstance(final_output, dict) else {})
+        if not ok_final:
+            raise RuntimeError("Final output schema validation failed: " + "; ".join(final_issues))

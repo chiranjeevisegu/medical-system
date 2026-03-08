@@ -4,27 +4,10 @@ import json
 import re
 
 from backend.model_loader import generate_reasoning
+from backend.utils.logger import get_logger
+from backend.utils.output_validator import coverage_score, parse_json_object, validate_json_format
 
-
-def _parse_json_response(text: str) -> dict:
-    cleaned = text.strip()
-    try:
-        parsed = json.loads(cleaned)
-        if isinstance(parsed, dict):
-            return parsed
-    except json.JSONDecodeError:
-        pass
-
-    match = re.search(r"\{.*\}", cleaned, flags=re.DOTALL)
-    if match:
-        try:
-            parsed = json.loads(match.group(0))
-            if isinstance(parsed, dict):
-                return parsed
-        except json.JSONDecodeError:
-            pass
-
-    return {}
+logger = get_logger(__name__)
 
 
 def _clean_sentence(text: str, max_chars: int) -> str:
@@ -100,26 +83,14 @@ def _is_valid_explanation(result: dict) -> bool:
 
 def _explanation_coverage_score(clinical_summary: dict, result: dict) -> float:
     diagnoses = [str(x).strip() for x in clinical_summary.get("diagnosis", []) if str(x).strip()]
-    if not diagnoses:
-        return 1.0
-    max_check = min(3, len(diagnoses))
-    to_check = diagnoses[:max_check]
     output = " ".join(
         [
             str(result.get("simple_explanation", "")),
             str(result.get("physiological_process", "")),
             str(result.get("plain_language_takeaway", "")),
         ]
-    ).lower()
-    hits = 0
-    for d in to_check:
-        d_tokens = [tok for tok in re.findall(r"[a-zA-Z0-9]+", d.lower()) if len(tok) > 3]
-        if not d_tokens:
-            continue
-        overlap = sum(1 for tok in d_tokens if tok in output)
-        if overlap / len(d_tokens) >= 0.4:
-            hits += 1
-    return hits / max(1, len(to_check))
+    )
+    return coverage_score(diagnoses[:3], output)
 
 
 def _heuristic_explanation(clinical_summary: dict, risk: dict) -> dict:
@@ -167,27 +138,46 @@ class ExplainabilityAgent:
         diagnosis_list = [str(x) for x in clinical_summary.get("diagnosis", []) if str(x).strip()][:5]
         prompt = (
             "You are explaining a hospital discharge report to a patient.\n"
-            "You must mention all major diagnoses provided below.\n"
-            "Explain:\n"
-            "1) Primary diagnosis.\n"
-            "2) At least two associated conditions.\n"
-            "3) One complication risk.\n"
-            "4) How it affects the body.\n"
-            "Write in simple language (grade 6-8), avoid jargon.\n"
-            "Return JSON only with keys: simple_explanation, physiological_process, plain_language_takeaway.\n"
+            "Write at a 6th-8th grade reading level. Avoid ALL medical jargon.\n"
+            "You MUST cover ALL FOUR of the following points:\n"
+            "1. Main disease: what the primary condition is, in simple plain language.\n"
+            "2. Body impact: how the disease affects the body (physiological process), explained simply.\n"
+            "3. Possible risks and complications the patient should know about.\n"
+            "4. Why follow-up care and monitoring are important.\n"
+            "You MUST mention ALL major diagnoses listed below.\n"
+            "Return JSON ONLY with exactly these three keys:\n"
+            "{\"simple_explanation\": \"...\", \"physiological_process\": \"...\", \"plain_language_takeaway\": \"\"}\n"
+            "Do NOT include any text before or after the JSON.\n"
             f"MAJOR_DIAGNOSES:\n{json.dumps(diagnosis_list, ensure_ascii=False)}\n"
             f"REPORT:\n{report_text}\n"
             f"CLINICAL_SUMMARY:\n{json.dumps(clinical_summary, ensure_ascii=False)}\n"
             f"RISK:\n{json.dumps(risk, ensure_ascii=False)}"
         )
-        parsed = _parse_json_response(generate_reasoning(prompt))
+        logger.debug("ExplainabilityAgent: attempt 1")
+        try:
+            parsed = parse_json_object(generate_reasoning(prompt))
+        except Exception as exc:  # noqa: BLE001
+            logger.error("ExplainabilityAgent: generate_reasoning failed on attempt 1: %s", exc)
+            parsed = {}
+        if not validate_json_format(parsed):
+            logger.debug("ExplainabilityAgent: attempt 2 (json format failed)")
+            try:
+                parsed = parse_json_object(generate_reasoning(prompt))
+            except Exception as exc:  # noqa: BLE001
+                logger.error("ExplainabilityAgent: generate_reasoning failed on attempt 2: %s", exc)
+                parsed = {}
         result = {
             "simple_explanation": str(parsed.get("simple_explanation", "")).strip(),
             "physiological_process": str(parsed.get("physiological_process", "")).strip(),
             "plain_language_takeaway": str(parsed.get("plain_language_takeaway", "")).strip(),
         }
         if not _is_valid_explanation(result) or _explanation_coverage_score(clinical_summary, result) < 0.5:
-            retry = _parse_json_response(generate_reasoning(prompt))
+            logger.debug("ExplainabilityAgent: coverage-retry")
+            try:
+                retry = parse_json_object(generate_reasoning(prompt))
+            except Exception as exc:  # noqa: BLE001
+                logger.error("ExplainabilityAgent coverage-retry failed: %s", exc)
+                retry = {}
             retry_result = {
                 "simple_explanation": str(retry.get("simple_explanation", "")).strip(),
                 "physiological_process": str(retry.get("physiological_process", "")).strip(),

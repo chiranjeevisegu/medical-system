@@ -11,6 +11,10 @@ import textstat
 from backend.baseline import BaselineSummarizer
 from backend.model_loader import CATEGORY_LABELS, generate_reasoning
 from backend.orchestrator import Orchestrator
+from backend.utils.logger import get_logger
+from backend.utils.metrics import semantic_qa_score
+
+logger = get_logger(__name__)
 
 
 LABELS_INV = {name: idx for idx, name in enumerate(CATEGORY_LABELS)}
@@ -48,6 +52,9 @@ class Evaluator:
             agent_disagreement_rate = self._agent_disagreement_rate(analysis)
             unsafe_recommendation_rate = self._unsafe_recommendation_rate(analysis)
             consistency_rate = self._consistency_rate(analysis)
+            # Semantic QA score using BioClinicalBERT cosine similarity (higher quality than token overlap)
+            logger.debug("Computing semantic_qa_score for case_id=%s", case_id)
+            sem_qa = semantic_qa_score(report_text, agent_explanation)
             true_label = self._category_label_from_case(case)
             pred_label = str(analysis.get("clinical_summary", {}).get("disease_category", "")).strip()
             if true_label and pred_label:
@@ -65,6 +72,7 @@ class Evaluator:
                     "baseline_length": self._word_count(baseline_summary),
                     "agent_length": self._word_count(agent_explanation),
                     "qa_score": self._qa_score(report_text, agent_explanation),
+                    "semantic_qa_score": sem_qa,
                     "patient_comprehension": patient_comprehension,
                     "information_coverage": information_coverage,
                     "trust_calibration": trust_calibration,
@@ -110,6 +118,7 @@ class Evaluator:
             ((df["original_length"] - df["agent_length"]) / df["original_length"].replace(0, 1)).mean()
         )
         avg_qa_score = float(df["qa_score"].mean())
+        avg_semantic_qa_score = float(df["semantic_qa_score"].mean()) if "semantic_qa_score" in df.columns else 0.0
         avg_patient_comprehension = float(df["patient_comprehension"].mean())
         avg_readability_fkgl = float(df["readability_fkgl"].mean())
         avg_information_coverage = float(df["information_coverage"].mean())
@@ -124,6 +133,7 @@ class Evaluator:
             "avg_fkgl_improvement": avg_fkgl_improvement,
             "avg_length_reduction": avg_length_reduction,
             "avg_qa_score": avg_qa_score,
+            "avg_semantic_qa_score": avg_semantic_qa_score,
             "avg_patient_comprehension": avg_patient_comprehension,
             "avg_readability_fkgl": avg_readability_fkgl,
             "avg_information_coverage": avg_information_coverage,

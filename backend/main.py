@@ -12,6 +12,9 @@ from backend.dataset_loader import MIMICDatasetLoader
 from backend.evaluation import Evaluator
 from backend.model_loader import preflight_models, runtime_status, train_clinical_classifier
 from backend.orchestrator import Orchestrator
+from backend.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 app = FastAPI(title="Explainable Multi-Agent Medical Report Understanding System")
 _ANALYSIS_CACHE: dict[str, dict[str, Any]] = {}
@@ -404,7 +407,8 @@ def analyze_case(case_id: str) -> dict:
     try:
         result = get_orchestrator().analyze_case(case_id)
         _ANALYSIS_CACHE[case_id] = result
-        return result
+        final_output = result.get("final_output", {})
+        return final_output if isinstance(final_output, dict) and final_output else result
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except Exception as exc:
@@ -419,5 +423,84 @@ def evaluate(limit: int | None = 20) -> dict:
         case_ids = orchestrator.list_case_ids()
         selected = case_ids[: max(1, min(limit, len(case_ids)))] if limit else case_ids[:20]
         return evaluator.evaluate_all(case_ids=selected)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@app.post("/evaluate_ablation")
+def evaluate_ablation(limit: int = 10) -> dict[str, Any]:
+    """Ablation study endpoint: compare single-LLM baseline vs multi-agent system.
+
+    Returns a side-by-side metrics comparison suitable for inclusion in a research paper.
+    Covers: FKGL improvement, QA score, semantic QA score, and information coverage.
+    """
+    try:
+        orchestrator = get_orchestrator()
+        baseline = get_baseline()
+        evaluator = Evaluator(orchestrator, baseline, orchestrator.settings.results_path)
+        all_case_ids = orchestrator.list_case_ids()
+        case_ids = all_case_ids[: max(1, min(limit, len(all_case_ids)))]
+
+        multi_agent_rows: list[dict[str, Any]] = []
+        baseline_rows: list[dict[str, Any]] = []
+
+        for case_id in case_ids:
+            case = orchestrator.get_case(case_id)
+            report_text = str(case.get("report_text", ""))
+
+            # --- multi-agent pipeline ---
+            logger.info("Ablation: running multi-agent pipeline for case_id=%s", case_id)
+            analysis = orchestrator.analyze_case(case_id)
+            agent_explanation = evaluator._flatten_explanation(analysis.get("explanation", {}))
+            multi_agent_rows.append({
+                "case_id": case_id,
+                "fkgl": evaluator._safe_fkgl(agent_explanation),
+                "length": evaluator._word_count(agent_explanation),
+                "qa_score": evaluator._qa_score(report_text, agent_explanation),
+                "information_coverage": evaluator._information_coverage(analysis, agent_explanation),
+                "unsafe_recommendation_rate": evaluator._unsafe_recommendation_rate(analysis),
+                "consistency_rate": evaluator._consistency_rate(analysis),
+            })
+
+            # --- single-LLM baseline ---
+            logger.info("Ablation: running baseline for case_id=%s", case_id)
+            baseline_output = baseline.summarize(report_text)
+            baseline_summary = baseline_output.get("summary", "")
+            baseline_fkgl = evaluator._safe_fkgl(baseline_summary)
+            baseline_qa = evaluator._qa_score(report_text, baseline_summary)
+            baseline_rows.append({
+                "case_id": case_id,
+                "fkgl": baseline_fkgl,
+                "length": evaluator._word_count(baseline_summary),
+                "qa_score": baseline_qa,
+                "information_coverage": 0.0,   # baseline has no structured clinical extraction
+                "unsafe_recommendation_rate": 0.0,
+                "consistency_rate": 0.0,
+            })
+
+        def _avg(rows: list[dict], key: str) -> float:
+            vals = [r[key] for r in rows if isinstance(r.get(key), (int, float))]
+            return round(sum(vals) / len(vals), 4) if vals else 0.0
+
+        keys = ["fkgl", "length", "qa_score", "information_coverage",
+                "unsafe_recommendation_rate", "consistency_rate"]
+        multi_avg = {k: _avg(multi_agent_rows, k) for k in keys}
+        base_avg = {k: _avg(baseline_rows, k) for k in keys}
+        improvement = {
+            "fkgl_reduction": round(base_avg["fkgl"] - multi_avg["fkgl"], 4),
+            "qa_score_gain": round(multi_avg["qa_score"] - base_avg["qa_score"], 4),
+            "information_coverage_gain": round(multi_avg["information_coverage"] - base_avg["information_coverage"], 4),
+            "length_reduction_pct": round(
+                (base_avg["length"] - multi_avg["length"]) / max(1, base_avg["length"]) * 100, 2
+            ),
+        }
+        logger.info("Ablation complete – num_cases=%d improvement=%s", len(case_ids), improvement)
+        return {
+            "num_cases": len(case_ids),
+            "multi_agent": multi_avg,
+            "baseline": base_avg,
+            "improvement": improvement,
+            "per_case": {"multi_agent": multi_agent_rows, "baseline": baseline_rows},
+        }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc

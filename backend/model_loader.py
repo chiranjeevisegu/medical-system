@@ -10,6 +10,9 @@ from torch import nn
 from transformers import AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer
 
 from backend.config import BACKEND_DIR, MODEL_BIOMEDICAL, MODEL_REASONING, get_settings
+from backend.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 # Loaded lazily on first use to avoid import-time crashes when caches are missing.
@@ -183,10 +186,10 @@ def generate_reasoning(prompt: str) -> str:
         tokenizer,
         model,
         prompt,
-        max_new_tokens=96,
-        temperature=0.0,
-        top_p=None,
-        do_sample=False,
+        max_new_tokens=300,
+        temperature=0.2,
+        top_p=0.9,
+        do_sample=True,
     )
 
 
@@ -293,10 +296,15 @@ def _build_classifier_training_data(samples: list[dict]) -> tuple[list[str], lis
         label = _infer_category_label(joined)
         texts.append(joined[:4000])
         labels.append(_CATEGORY_TO_IDX[label])
+
+    # Log label distribution for transparency
+    from collections import Counter  # noqa: PLC0415
+    dist = Counter(CATEGORY_LABELS[i] for i in labels)
+    logger.info("Classifier training label distribution: %s (total=%d)", dict(dist), len(labels))
     return texts, labels
 
 
-def train_clinical_classifier(samples: list[dict], epochs: int = 6, force_retrain: bool = False) -> dict[str, float | int]:
+def train_clinical_classifier(samples: list[dict], epochs: int = 7, force_retrain: bool = False) -> dict[str, float | int]:
     global _CLINICAL_CLASSIFIER, _CLASSIFIER_DEVICE
     if _CLASSIFIER_PATH.exists() and not force_retrain and _CLINICAL_CLASSIFIER is not None:
         return {"epochs": 0, "train_loss": 0.0}
@@ -351,6 +359,19 @@ def train_clinical_classifier(samples: list[dict], epochs: int = 6, force_retrai
         _CLASSIFIER_PATH,
     )
     _CLINICAL_CLASSIFIER = model.eval()
+
+    # Log post-training confusion matrix on training set
+    with torch.inference_mode():
+        train_logits = model(x)
+        train_preds = torch.argmax(train_logits, dim=-1).tolist()
+    from collections import Counter  # noqa: PLC0415
+    correct = sum(1 for p, t in zip(train_preds, labels) if p == t)
+    logger.info("Classifier train accuracy: %.2f%% (%d/%d)", 100.0 * correct / max(1, len(labels)), correct, len(labels))
+    pred_dist = Counter(CATEGORY_LABELS[i] for i in train_preds)
+    true_dist = Counter(CATEGORY_LABELS[i] for i in labels)
+    logger.info("Classifier training predictions: %s", dict(pred_dist))
+    logger.info("Classifier training ground-truth: %s", dict(true_dist))
+
     return {"epochs": epochs_eff, "train_loss": last_loss, "train_size": len(texts), "batch_size": batch_size}
 
 

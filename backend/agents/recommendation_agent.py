@@ -4,27 +4,11 @@ import json
 import re
 
 from backend.model_loader import generate_reasoning
+from backend.utils.logger import get_logger
+from backend.utils.output_validator import parse_json_object, validate_recommendation_output
+from backend.utils.text_cleaner import clean_list_items
 
-
-def _parse_json_response(text: str) -> dict:
-    cleaned = text.strip()
-    try:
-        parsed = json.loads(cleaned)
-        if isinstance(parsed, dict):
-            return parsed
-    except json.JSONDecodeError:
-        pass
-
-    match = re.search(r"\{.*\}", cleaned, flags=re.DOTALL)
-    if match:
-        try:
-            parsed = json.loads(match.group(0))
-            if isinstance(parsed, dict):
-                return parsed
-        except json.JSONDecodeError:
-            pass
-
-    return {}
+logger = get_logger(__name__)
 
 
 def _clean_item(text: str, max_chars: int = 160) -> str:
@@ -72,7 +56,8 @@ def _is_valid_recommendation(result: dict) -> bool:
     joined = " ".join(safe + urgent + [str(result.get("boundaries", ""))])
     if _contains_placeholder(joined):
         return False
-    return True
+    is_ok, _ = validate_recommendation_output(result)
+    return is_ok
 
 
 def _fallback_recommendation(report_text: str, clinical_summary: dict, risk: dict) -> dict:
@@ -151,24 +136,39 @@ class RecommendationAgent:
 
     def run(self, report_text: str, clinical_summary: dict, risk: dict) -> dict:
         prompt = (
-            "You are a safety-focused healthcare guidance assistant.\n"
-            "Based on risk and explanation, provide:\n"
-            "1) 3 to 5 safe next steps.\n"
-            "2) 2 urgent warning signs.\n"
-            "Rules: no prescriptions, no dosage, no diagnosis claims, no placeholders, no empty arrays.\n"
-            "Return JSON only with keys: safe_next_steps, urgent_attention_signs, boundaries.\n"
+            "You are a patient safety assistant. Generate safe, non-clinical guidance.\n"
+            "STRICT RULES – you MUST follow ALL of these:\n"
+            "- Do NOT diagnose the patient.\n"
+            "- Do NOT prescribe any medication.\n"
+            "- Do NOT mention any dosage, drug name, or drug dose.\n"
+            "- Do NOT use placeholders like 'item1', 'item2', or '...'.\n"
+            "REQUIRED OUTPUT:\n"
+            "- Exactly 3 to 5 concrete, safe next steps the patient should take.\n"
+            "- Exactly 2 warning symptoms that require urgent medical attention.\n"
+            "Return JSON ONLY with these keys: safe_next_steps (list), urgent_attention_signs (list), boundaries (string).\n"
+            "Do NOT include any text before or after the JSON object.\n"
             f"REPORT:\n{report_text}\n"
             f"CLINICAL_SUMMARY:\n{json.dumps(clinical_summary, ensure_ascii=False)}\n"
             f"RISK:\n{json.dumps(risk, ensure_ascii=False)}"
         )
-        parsed = _parse_json_response(generate_reasoning(prompt))
+        logger.debug("RecommendationAgent: attempt 1")
+        try:
+            parsed = parse_json_object(generate_reasoning(prompt))
+        except Exception as exc:  # noqa: BLE001
+            logger.error("RecommendationAgent generate_reasoning failed: %s", exc)
+            parsed = {}
         result = {
             "safe_next_steps": [str(x) for x in parsed.get("safe_next_steps", []) if str(x).strip()],
             "urgent_attention_signs": [str(x) for x in parsed.get("urgent_attention_signs", []) if str(x).strip()],
             "boundaries": str(parsed.get("boundaries", "")).strip(),
         }
         if not _is_valid_recommendation(result):
-            retry = _parse_json_response(generate_reasoning(prompt))
+            logger.debug("RecommendationAgent: attempt 2 (retry)")
+            try:
+                retry = parse_json_object(generate_reasoning(prompt))
+            except Exception as exc:  # noqa: BLE001
+                logger.error("RecommendationAgent generate_reasoning failed (attempt 2): %s", exc)
+                retry = {}
             retry_result = {
                 "safe_next_steps": [str(x) for x in retry.get("safe_next_steps", []) if str(x).strip()],
                 "urgent_attention_signs": [str(x) for x in retry.get("urgent_attention_signs", []) if str(x).strip()],
@@ -189,4 +189,7 @@ class RecommendationAgent:
             result["safe_next_steps"] = fallback["safe_next_steps"]
             result["urgent_attention_signs"] = fallback["urgent_attention_signs"]
             result["boundaries"] = fallback["boundaries"]
+        # Final MIMIC token strip on output lists
+        result["safe_next_steps"] = clean_list_items(result["safe_next_steps"])
+        result["urgent_attention_signs"] = clean_list_items(result["urgent_attention_signs"])
         return result

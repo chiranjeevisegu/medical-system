@@ -1,0 +1,309 @@
+.metrics-section {
+    margin-bottom: 28px;
+}
+
+.metrics-section-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.metrics-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.metrics-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.metrics-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+@media (max-width: 900px) {
+
+    .metrics-grid-4,
+    .metrics-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 540px) {
+
+    .metrics-grid-4,
+    .metrics-grid-3,
+    .metrics-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Metric card */
+.metric-card {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.metric-bar-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.metric-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+}
+
+.metric-desc {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.metric-extra {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    opacity: 0.7;
+}
+
+/* Publication note */
+.publication-note {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid #fbbf24;
+}
+
+/* Per-class table */
+.per-class-section {
+    margin-bottom: 24px;
+}
+
+.pc-title-row {
+    margin-bottom: 16px;
+}
+
+.pc-title-row h2 {
+    margin: 0;
+}
+
+.per-class-table {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow-x: auto;
+}
+
+.pc-header,
+.pc-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 80px;
+    gap: 0;
+    align-items: center;
+    min-width: 420px;
+}
+
+.pc-header {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    margin-bottom: 2px;
+}
+
+.pc-header span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.pc-row {
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+}
+
+.pc-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.pc-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.pc-avg {
+    border-top: 1px solid var(--border);
+    background: rgba(56, 189, 248, 0.04) !important;
+}
+
+.pc-cls {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.pc-avg .pc-cls {
+    font-weight: 700;
+}
+
+.pc-num {
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.pc-sup {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+/* Charts */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chart-card {
+    min-height: 360px;
+}
+
+.chart-card h2 {
+    margin-bottom: 16px;
+}
+
+/* Custom tooltip */
+.custom-tooltip {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 0.82rem;
+}
+
+.ct-label {
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+/* Ablation */
+.ablation-card {
+    margin-bottom: 24px;
+}
+
+.ablation-desc {
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.ablation-note {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 16px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.ablation-table {
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+}
+
+.ablation-header,
+.ablation-row {
+    display: grid;
+    grid-template-columns: 2.2fr 1.4fr 1.6fr 1.4fr;
+    gap: 0;
+    padding: 10px 14px;
+    align-items: center;
+    min-width: 480px;
+}
+
+.ablation-header {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+}
+
+.ablation-header span {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.ablation-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ablation-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.abl-metric {
+    font-weight: 600;
+    font-size: 0.86rem;
+}
+
+.abl-base {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+}
+
+.abl-agent {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.abl-delta {
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+}
