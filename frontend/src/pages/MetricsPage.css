@@ -98,11 +98,11 @@
 .publication-note {
     margin-top: 10px;
     font-size: 0.78rem;
-    color: #fbbf24;
-    background: rgba(251, 191, 36, 0.08);
+    color: #92400e;
+    background: #fef3c7;
     padding: 8px 14px;
     border-radius: var(--radius-sm);
-    border-left: 3px solid #fbbf24;
+    border-left: 3px solid #d97706;
 }
 
 /* Per-class table */
@@ -155,16 +155,16 @@
 }
 
 .pc-row:nth-child(even) {
-    background: rgba(255, 255, 255, 0.025);
+    background: #f8fafc;
 }
 
 .pc-row:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: #eff6ff;
 }
 
 .pc-avg {
     border-top: 1px solid var(--border);
-    background: rgba(56, 189, 248, 0.04) !important;
+    background: rgba(14, 165, 233, 0.06) !important;
 }
 
 .pc-cls {
@@ -213,17 +213,30 @@
 
 /* Custom tooltip */
 .custom-tooltip {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-md);
     padding: 10px 14px;
     font-size: 0.82rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
 .ct-label {
     color: var(--text-secondary);
     margin-bottom: 4px;
     font-weight: 600;
+}
+
+/* Full-width chart for 3rd chart */
+.chart-wide {
+    margin-bottom: 24px;
+}
+
+.chart-caption {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
 /* Ablation */
@@ -277,11 +290,11 @@
 }
 
 .ablation-row:nth-child(even) {
-    background: rgba(255, 255, 255, 0.02);
+    background: #f8fafc;
 }
 
 .ablation-row:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: #eff6ff;
 }
 
 .abl-metric {

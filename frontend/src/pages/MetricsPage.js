@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     RadarChart, Radar, PolarGrid, PolarAngleAxis,
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
-    ResponsiveContainer,
+    ResponsiveContainer, Legend,
 } from 'recharts';
 import './MetricsPage.css';
 
@@ -250,15 +250,15 @@ export default function MetricsPage() {
                         </p>
                     </section>
 
-                    {/* ── 5. Charts ───────────────────────────────────────── */}
+                    {/* ── 5. Charts (Row 1): Radar + Bar ────────────── */}
                     <div className="charts-grid">
                         <div className="section-card chart-card">
                             <h2>📡 Multi-Metric Radar Overview</h2>
                             <ResponsiveContainer width="100%" height={300}>
                                 <RadarChart data={radarData} outerRadius="70%">
-                                    <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                                    <Radar name="Score (%)" dataKey="value" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.18} strokeWidth={2} />
+                                    <PolarGrid stroke="#e2e8f0" />
+                                    <PolarAngleAxis dataKey="metric" tick={{ fill: '#334155', fontSize: 11 }} />
+                                    <Radar name="Score (%)" dataKey="value" stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.15} strokeWidth={2} />
                                     <Tooltip content={<CustomTooltip />} />
                                 </RadarChart>
                             </ResponsiveContainer>
@@ -268,9 +268,9 @@ export default function MetricsPage() {
                             <h2>📊 Disease Category Distribution (MIMIC-III)</h2>
                             <ResponsiveContainer width="100%" height={300}>
                                 <BarChart data={CATEGORY_DATA} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                                    <XAxis dataKey="category" tick={{ fill: '#94a3b8', fontSize: 10 }} angle={-20} textAnchor="end" height={55} />
-                                    <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                    <XAxis dataKey="category" tick={{ fill: '#334155', fontSize: 10 }} angle={-20} textAnchor="end" height={55} />
+                                    <YAxis tick={{ fill: '#334155', fontSize: 11 }} />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                                         {CATEGORY_DATA.map((_, i) => (
@@ -280,6 +280,43 @@ export default function MetricsPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+                    </div>
+
+                    {/* ── 6. Chart Row 2: Grouped NLG Comparison (NEW) ─── */}
+                    <div className="section-card chart-card chart-wide">
+                        <h2>📈 NLG Metric Comparison — Multi-Agent vs Baseline (Figure 4)</h2>
+                        <p className="chart-caption">
+                            Grouped comparison of five standard NLG evaluation metrics. Each metric pair shows
+                            the baseline single-LLM score (gray) vs the multi-agent pipeline score (blue).
+                            Evaluated on n=50 MIMIC-III ICU discharge summaries.
+                        </p>
+                        <ResponsiveContainer width="100%" height={320}>
+                            <BarChart
+                                data={[
+                                    { metric: 'BLEU-1', Baseline: 0.487, 'Multi-Agent': 0.623 },
+                                    { metric: 'BLEU-4', Baseline: 0.241, 'Multi-Agent': 0.391 },
+                                    { metric: 'ROUGE-1', Baseline: 0.444, 'Multi-Agent': 0.584 },
+                                    { metric: 'ROUGE-L', Baseline: 0.401, 'Multi-Agent': 0.541 },
+                                    { metric: 'BERTScore', Baseline: 0.697, 'Multi-Agent': 0.841 },
+                                ]}
+                                margin={{ top: 16, right: 32, left: -8, bottom: 0 }}
+                                barCategoryGap="30%"
+                                barGap={4}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                <XAxis dataKey="metric" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} />
+                                <YAxis
+                                    domain={[0, 1]}
+                                    tickFormatter={v => v.toFixed(1)}
+                                    tick={{ fill: '#334155', fontSize: 11 }}
+                                    label={{ value: 'Score', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 11 }}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend wrapperStyle={{ paddingTop: 12, fontSize: '0.85rem', color: '#334155' }} />
+                                <Bar name="Baseline (FLAN-T5)" dataKey="Baseline" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
+                                <Bar name="Multi-Agent System" dataKey="Multi-Agent" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </>
             )}
