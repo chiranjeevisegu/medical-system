@@ -30,7 +30,6 @@ export default function Navbar() {
         <nav className="navbar">
             <div className="navbar-inner">
                 <NavLink to="/" className="navbar-brand">
-                    <span className="brand-icon">🧠</span>
                     <span className="brand-text">Med<span className="brand-accent">AI</span></span>
                 </NavLink>
 

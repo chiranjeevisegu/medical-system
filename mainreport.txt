@@ -1,0 +1,1568 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[left=1.5in,right=1.0in,top=1.0in,bottom=1.0in]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{parskip}
+\usepackage{colortbl}
+\usepackage{tcolorbox}
+\usepackage{booktabs}
+\usepackage{etoolbox}
+\usepackage{needspace}
+
+% ── Colour definitions  (blue kept ONLY for tables; everything else black) ────
+\definecolor{TblHead}{RGB}{30,90,160}       % table header – medium blue
+\definecolor{TblAlt}{RGB}{232,242,252}      % alternating row – very pale blue
+\definecolor{TblHL}{RGB}{210,228,248}       % summary/highlight row
+\definecolor{TblBorder}{RGB}{100,140,190}   % table border – softer blue
+
+% ── Hyperref (black links – looks clean in print) ─────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=black,
+  pdftitle={An Explainable Multi-Agent Framework for Patient-Centric Medical Report Understanding}
+}
+
+% ── Line / paragraph spacing ──────────────────────────────────────────────────
+\setstretch{1.20}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+% ── Header / Footer ───────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Amrita Vishwa Vidyapeetham}}
+\fancyhead[R]{\small\textit{Department of AI \& Data Science}}
+\fancyfoot[R]{\small\thepage}
+\fancyfoot[L]{\small\textit{Multi-Agent Framework for Patient-Centric Medical Report Understanding}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ── Chapter style – 16 pt Bold, black ─────────────────────────────────────────
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{16}{20}\bfseries}
+  {\normalfont\fontsize{11}{14}\bfseries Chapter \thechapter}
+  {4pt}
+  {\fontsize{16}{20}\bfseries}
+  [\vspace{2pt}\rule{\linewidth}{1.2pt}]
+\titlespacing*{\chapter}{0pt}{0pt}{14pt}
+
+% ── Section – 14 pt Bold, black ───────────────────────────────────────────────
+\titleformat{\section}
+  {\normalfont\fontsize{14}{18}\bfseries}
+  {\thesection}{1em}{}
+  [\vspace{1pt}\rule{\linewidth}{0.5pt}]
+\titlespacing*{\section}{0pt}{12pt}{5pt}
+
+% ── Subsection – 12 pt Bold, black ───────────────────────────────────────────
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{16}\bfseries}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{9pt}{3pt}
+
+% ── Subsubsection – 12 pt Bold, black ────────────────────────────────────────
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{15}\bfseries}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{7pt}{2pt}
+
+% ── Captions – 12 pt Bold, bottom ────────────────────────────────────────────
+\captionsetup{font={bf,small},labelfont=bf,justification=centering,
+              skip=4pt,position=below}
+
+% ── Table defaults ────────────────────────────────────────────────────────────
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{5pt}
+
+% ── Keep \chapter pages on fancy style ───────────────────────────────────────
+\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{fancy}}{}{}
+
+% ── TOC – black fonts ─────────────────────────────────────────────────────────
+\setlength{\cftbeforechapskip}{4pt}
+\setlength{\cftbeforesecskip}{1pt}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  TITLE PAGE
+% ═══════════════════════════════════════════════════════════════════════════════
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+
+\rule{\linewidth}{1.5pt}\\[6pt]
+{\fontsize{14}{18}\bfseries
+AMRITA VISHWA VIDYAPEETHAM}\\[2pt]
+{\large\bfseries School of Computing, Amaravati -- 522503}\\[3pt]
+{\normalsize Department of Artificial Intelligence and Data Science}\\[3pt]
+\rule{\linewidth}{1.5pt}
+
+\vspace{0.8cm}
+{\normalsize in partial fulfilment of the requirements for the degree of}\\[5pt]
+{\large\bfseries BACHELOR OF TECHNOLOGY}\\[2pt]
+{\large\bfseries in Computer Science and Engineering -- Artificial Intelligence}
+
+\vspace{0.7cm}
+\rule{12cm}{0.8pt}\\[8pt]
+{\fontsize{16}{21}\bfseries
+AN EXPLAINABLE MULTI-AGENT FRAMEWORK\\[3pt]
+FOR PATIENT-CENTRIC MEDICAL REPORT\\[3pt]
+UNDERSTANDING AND RECOMMENDATION}\\[8pt]
+\rule{12cm}{0.8pt}
+
+\vspace{0.5cm}
+{\normalsize\itshape Accepted at ICATEET-2026 \quad Paper ID: AI-041}
+
+\vspace{0.7cm}
+{\large\bfseries Submitted by}\\[8pt]
+\begin{tcolorbox}[colback=white,colframe=black,boxrule=0.7pt,
+  arc=3pt,width=8.5cm,left=5pt,right=5pt,top=5pt,bottom=5pt]
+\centering\normalsize
+\textbf{Ch.\ Venkata Lakshmi Vardhan}\\
+{\small AV.EN.U4AIE22006}\\[5pt]
+\textbf{Venkata Chiranjeevi Segu}\\
+{\small AV.EN.U4AIE22036}\\[5pt]
+\textbf{A.\ Venkata Sai Harshendra}\\
+{\small AV.EN.U4AIE22059}
+\end{tcolorbox}
+
+\vspace{0.6cm}
+\begin{tcolorbox}[colback=white,colframe=black,boxrule=0.7pt,
+  arc=3pt,width=8.5cm,left=5pt,right=5pt,top=5pt,bottom=5pt]
+\centering\normalsize
+\textbf{Project Mentor}\\[4pt]
+Dr.\ R.\ Satya Rajendra Singh\\
+{\small Assistant Professor, Amrita School of Computing}\\
+{\small Amrita Vishwa Vidyapeetham, Amaravati}\\
+{\small r\_satyarajendrasingh@av.amrita.edu}
+\end{tcolorbox}
+
+\vfill
+\rule{\linewidth}{1.5pt}\\[3pt]
+{\large\bfseries School of Computing \quad Amrita Vishwa Vidyapeetham \quad March 2026}
+\end{center}
+\end{titlepage}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CERTIFICATE
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage\thispagestyle{fancy}
+\begin{center}
+{\fontsize{16}{20}\bfseries AMRITA VISHWA VIDYAPEETHAM}\\[2pt]
+{\large\bfseries School of Computing, Amaravati -- 522503}\\[8pt]
+\rule{\linewidth}{1.2pt}\\[6pt]
+{\fontsize{16}{20}\bfseries CERTIFICATE}\\[4pt]
+\rule{7cm}{0.6pt}
+\end{center}
+\vspace{0.5cm}
+
+This is to certify that the project report titled \textbf{``An Explainable Multi-Agent Framework for Patient-Centric Medical Report Understanding and Recommendation''} is a bonafide work of \textbf{Ch.\ Venkata Lakshmi Vardhan} (AV.EN.U4AIE22006), \textbf{Venkata Chiranjeevi Segu} (AV.EN.U4AIE22036), and \textbf{A.\ Venkata Sai Harshendra} (AV.EN.U4AIE22059), submitted in partial fulfilment of the requirements of the award of Degree of Bachelor of Technology in Computer Science and Engineering - Artificial Intelligence. The work carried out by the candidate in this project is a bonafide record of the work done under our guidance and supervision at School of Computing, Amrita Vishwa Vidyapeetham, Amaravati. 
+
+\vspace{2cm}
+\noindent
+\begin{minipage}[t]{0.47\textwidth}
+\rule{5.5cm}{0.5pt}\\[3pt]
+\textbf{Dr.\ R.\ Satya Rajendra Singh}\\
+Project Mentor, Assistant Professor\\
+Amrita School of Computing\\
+Amrita Vishwa Vidyapeetham, Amaravati\\
+{\small r\_satyarajendrasingh@av.amrita.edu}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\rule{5.5cm}{0.5pt}\\[3pt]
+\textbf{Dr.\ M.\ Nageswara Rao}\\
+Chairperson\\
+School of Computing\\
+Amrita Vishwa Vidyapeetham, Amaravati
+\end{minipage}
+
+\vspace{1.5cm}
+\noindent
+\rule{5cm}{0.5pt}\\[3pt]
+\textbf{Project Coordinator}\\
+Designation:\\
+School of Computing
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  DECLARATION
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage\thispagestyle{fancy}
+\begin{center}
+{\fontsize{16}{20}\bfseries DECLARATION}\\[4pt]
+\rule{7cm}{0.6pt}
+\end{center}
+\vspace{0.5cm}
+
+We, the undersigned, declare that the project \textbf{``An Explainable Multi-Agent Framework for Patient-Centric Medical Report Understanding and Recommendation''} is our own work conducted during the period of our study and that it has not been submitted for the award of any other degree or diploma in this or any other institution or university. Appropriate credit has been given in this report wherever the work of others has been cited, in line with the ethical norms of reporting scientific information. The content of this report is original work of the author and has not been submitted in any other academic institution for any degree. 
+
+\vspace{2.5cm}
+\noindent
+\begin{tabular}{p{7cm}p{5cm}}
+\textbf{Ch.\ Venkata Lakshmi Vardhan}  & \rule{4.5cm}{0.5pt}\\[1.2cm]
+\textbf{Venkata Chiranjeevi Segu}      & \rule{4.5cm}{0.5pt}\\[1.2cm]
+\textbf{A.\ Venkata Sai Harshendra}    & \rule{4.5cm}{0.5pt}\\
+\end{tabular}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  ABSTRACT + GRAPHICAL ABSTRACT
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage\thispagestyle{fancy}
+\begin{center}
+{\fontsize{16}{20}\bfseries ABSTRACT}\\[4pt]
+\rule{7cm}{0.6pt}
+\end{center}
+\vspace{0.4cm}
+
+Clinical discharge summaries are the most information-dense document that a patient is given when discharged from hospital care, yet they continue to be systematically invisible to the populations they purport to describe. Written only in the language of clinical medicine - with the inclusion of ICD-10 diagnostic codes, subspecialty abbreviations, Latin pharmacological notation, and a multitude of implicit domain assumptions - discharge summaries are routinely read at a post-graduate level, rendering them too complex for a majority of adult patients to understand. The described effects are clinically meaningful: poor medication adherence, failure to attend follow-up, unnecessary health anxiety, and avoidable readmission - particularly for patients with chronic disease such as heart failure and diabetes. Although clinical natural language processing is rapidly emerging as a discipline of research, the primary focus continues to be physician-facing applications - automated ICD coding, clinical decision support, documentation assistance - rather than patients, with tools designed to enhance patients' understanding of their own medical records still in their infancy. This work contributes directly to that void.
+
+We introduce \textit{xMaReport}: an Explainable Multi-Agent Patient-Centric Medical Report Understanding and Recommendation System --- a two-stage AI pipeline that accepts a raw MIMIC-III discharge summary as input and delivers a structured, safety-verified, plain-language patient-facing explanation as output. In Stage~1, discharge summaries are preprocessed by the \texttt{MIMICDatasetLoader}, which constructs composite reports from \texttt{NOTEEVENTS.csv},
+\texttt{DIAGNOSES\_ICD.csv}, and \texttt{LABEVENTS.csv}, followed by PHI token removal via the \texttt{TextCleaner} processor. BioClinicalBERTencodes the cleaned report, and the generated 768-dimensional \texttt{CLS} embedding is fed into a linear classification head trained using class-weighted cross-entropy loss, classifying the report into one of five disease categories: Cardiovascular, Respiratory, Endocrine, Infectious, or Neurological. In Stage~2, a six-agent FLAN-T5-Largereasoning pipeline, coordinated by a
+\texttt{SequentialAgentFlow} orchestrator, further processes the classified report via specialised agents responsible for clinical extraction, risk stratification, plain-language explanation, confidence-gated recommendation generation, evidence-based justification, and two-pass safety verification. The complete system is delivered with a React frontend and FastAPI backend. Safety is enforced through a confidence gate at Verification Agent~I (threshold $= 0.55$) and a final output review at Verification Agent~II, with orchestrator-level regeneration triggered upon identification of violations.
+
+The system was evaluated on 20 real MIMIC-III discharge summaries across all five disease categories under a six-metric evaluation suite comprising classification F1, Flesch-Kincaid Grade Level (FKGL), semantic QA accuracy established via BioClinicalBERT cosine similarity, information coverage, unsafe recommendation rate, and clinical fact consistency rate. The proposed framework attains a macro-average classification F1 of $0.83$, lowers the mean FKGL from $16.3$ to $8.1$ - an $8.2$ grade-level improvement expanding readability from the top $10$--$15\%$ to the majority of the adult population - and retains $87.8\%$ of key clinical information. The Unsafe Recommendation Rate is $0.0\%$ across all test cases. Against a single-prompt FLAN-T5-Large baseline using the identical underlying model, the multi-agent architecture improves semantic QA accuracy by $12.2$ percentage points and eliminates all three safety violations observed in the baseline, demonstrating that task decomposition, specialised prompting, and layered verification - rather than model scale - are the determining factors in clinical AI safety performance.
+
+\bigskip
+\noindent\textbf{Keywords:} Clinical NLP, Multi-Agent AI, BioClinicalBERT, FLAN-T5-Large, MIMIC-III, Patient Explainability, Safety Verification, Discharge Summary, Readability.
+\end{abstract}
+
+
+\vspace{0.6cm}
+\begin{center}
+\rule{10cm}{0.5pt}\\[4pt]
+{\normalsize\bfseries GRAPHICAL ABSTRACT}\\[4pt]
+\rule{10cm}{0.5pt}
+\end{center}
+\vspace{0.3cm}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97\textwidth]{GA.png}
+\caption*{\small\bfseries System Description : A raw MIMIC-III discharge summary is first cleaned and augmented with diagnosis and lab context, then it is classified by BioClinicalBERT and pipelined through a six-agent FLAN-T5-Large agent to generate a structured, safety-checked, patient-accessible report including risk level, key findings, safe next steps, and justification. }
+\end{figure}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  ACKNOWLEDGEMENT
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage\thispagestyle{fancy}
+\begin{center}
+{\fontsize{16}{20}\bfseries ACKNOWLEDGEMENT}\\[4pt]
+\rule{7cm}{0.6pt}
+\end{center}
+\vspace{0.4cm}
+
+We thank our beloved Chancellor Sri Mata Amritanandamayi Devi AMMA for the opportunity to conduct this work in the academic ambience of this university and for which we are eternally indebted. We are grateful to the Board of Management for providing with the necessary amenities and institutional support during the tenure of the project. We are grateful to Mr.\ M.\ S.\ Vijayendra, Executive Director of Amaravati Campus, Prof.\ C.\ K.\ Jayashankar, Principal of Amaravati Campus and Dr.\ M.\ Nageswara Rao, Chairperson of Amrita School of Computing, for their support and inspiration.
+
+Our deepest and most sincere gratitude goes to our guide \textbf{Dr.\ R.\ Satya Rajendra Singh}, Assistant Professor, Amrita School of Computing, Amrita Vishwa Vidyapeetham, Amaravati, for his invaluable patience, profound technical acumen and unwavering motivation since the inception of this work till its completion; without his relentless support, this work would not have been possible. His guidance in clinical NLP, multi-agent system design, and evaluation techniques was foundational to this report. We also thank the panelists for their constructive critiques which led to the improvement of the system design and report quality.
+
+We would like to thank all the faculty of SC who were welcoming and helpful all throughout the semester. Lastly, we would like to express our gratitude to our loved ones for their patience, motivation and for providing us with the moral support needed to pull through all the long hours required for the successful completion of this project. 
+
+\vspace{1.8cm}
+\noindent\hfill
+\begin{minipage}{5.5cm}
+\textbf{Ch.\ Venkata Lakshmi Vardhan}\\[0.4cm]
+\textbf{Venkata Chiranjeevi Segu}\\[0.4cm]
+\textbf{A.\ Venkata Sai Harshendra}
+\end{minipage}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  FRONT MATTER
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage
+\pagenumbering{roman}\setcounter{page}{1}
+\tableofcontents
+\newpage\listoftables
+\newpage\listoffigures
+
+% ── List of Abbreviations ─────────────────────────────────────────────────────
+\newpage
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}
+
+\noindent The following abbreviations are used throughout this report.
+Terms are listed alphabetically for ease of reference.
+
+\vspace{6pt}
+{\small
+\begin{longtable}{|C{2.8cm}|L{10.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Abbreviation & \color{white}\bfseries Full Form \\
+\hline\endhead
+AI           & Artificial Intelligence \\
+\hline\rowcolor{TblAlt}
+API          & Application Programming Interface \\
+\hline
+BERT         & Bidirectional Encoder Representations from Transformers \\
+\hline\rowcolor{TblAlt}
+BioClinicalBERT & Biomedical Clinical BERT, pre-trained on MIMIC-III clinical notes \\
+\hline
+CLS          & Classification Token (special first token in BERT) \\
+\hline\rowcolor{TblAlt}
+CORS         & Cross-Origin Resource Sharing \\
+\hline
+EHR          & Electronic Health Record \\
+\hline\rowcolor{TblAlt}
+FKGL         & Flesch-Kincaid Grade Level \\
+\hline
+FLAN-T5      & Fine-tuned Language Net based on the Text-to-Text Transfer Transformer \\
+\hline\rowcolor{TblAlt}
+GPU          & Graphics Processing Unit \\
+\hline
+ICD          & International Classification of Diseases \\
+\hline\rowcolor{TblAlt}
+JSON         & JavaScript Object Notation \\
+\hline
+LLM          & Large Language Model \\
+\hline\rowcolor{TblAlt}
+MIMIC-III    & Medical Information Mart for Intensive Care, Version III \\
+\hline
+NLP          & Natural Language Processing \\
+\hline\rowcolor{TblAlt}
+NER          & Named Entity Recognition \\
+\hline
+QA           & Question Answering \\
+\hline\rowcolor{TblAlt}
+RAG          & Retrieval-Augmented Generation \\
+\hline
+T5           & Text-to-Text Transfer Transformer \\
+\hline
+\end{longtable}}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  MAIN MATTER
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage
+\pagenumbering{arabic}\setcounter{page}{1}
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 1 — INTRODUCTION
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Introduction}
+
+\section{Background and Context}
+
+Over the past 10 years, there has been an explosive growth in the amount of clinical documentation generated within modern healthcare organizations. Now, Electronic Health Records are able to hold everything from a patient's detailed history to laboratory values, imaging results, surgical notes and discharge summaries, all within a single digital record. Such documentation improves physician decision-making and continuity of care, but it creates a practical problem that is given far less attention: the reports that offer the most granularity about a patient’s health are the reports that patients are least able to read and act on. 
+
+Discharge summaries are written by clinicians and intended for clinicians. The language of the discharge summary fulfils the need for professional communication: the use of abbreviations (such as LBBB or NSTEMI), diagnostic codes of the ICD-10, Latin pharmacological forms (e.g. \textit{per os}) and subspecialty jargon, which can be understood by a cardiologist or an intensivist but is simply gibberish to the patient it is describing. Readability analyses have consistently found the typical discharge summary to be written at a post-graduate level of literacy, far beyond what the average person is able to read \cite{Meade1992}. 
+
+The fallout is not theoretical. Those who can’t decipher their discharge instructions are more prone to skip follow-up visits, take medicines improperly or go to unreliable websites for information \cite{Chen2024,Smith2022} Patients unable to understand their discharge instructions are at risk of missing follow-up visits, taking medications incorrectly, or obtaining information from unreliable websites \cite{Chen2024,Smith2022}. Chronic disease management studies have demonstrated strong associations with patient health literacy and readmission rates, as well as long-term control of heart failure and diabetes, with poorer-readable patients having increased rates of readmission and less optimal control of heart failure and diabetes \cite{PatientGroup2024}. To summarize: the data exists — it just isn’t getting to the patient in a way that they can apply it. 
+
+AI, and natural language processing in particular, provides a potential way to do just that. Large transformer models trained on clinical text, e.g., BioClinicalBERT \cite{Alsentzer2019}, serve as kernels of domain knowledge for downstream clinical classification and information extraction problems. Instruction-tuned generative models like FLAN-T5-Large \cite{Wei2022} can generate well-formed and constrained natural language for structured inputs. Combined, these elements lay the technological groundwork for a system that can read a clinical report, grasp what it says, and convey it to a patient in plain language — safely, accurately, and without supplanting the physician. 
+
+\section{Problem  Statement and Challenges }
+
+The fundamental issue this project seeks to address is: can an AI system, given an unstructured medical discharge summary written in clinical jargon, generate a structured explanation of the condition of the patient that is accessible to the patient, along with safe, justified, and clinically grounded advice -- without usurping the role of a physician? Behind this question there are a number of technical and ethical issues that are more specific. 
+
+\subsection{Complexity of Clinical Language }
+
+To solve complex problems in the healthcare domain requires understanding both computational and medical principles. One discharge summary alone could have nested conditional statements for medication dosing, temporal references to previous admissions, specialist jargon from a subspecialty, and context dependent acronyms that have different meanings in different clinical settings. To translate this language requires more than replacing difficult“words”with easier ones; it requires an understanding of the clinical relationships between signs and symptoms, diagnoses and treatments, and which information a convalescing patient at home is most likely to want and need. 
+
+\subsection{Safety and Non-Diagnostic Limitations }
+
+Any AI that engages with patients in a healthcare environment should be functioning within tight constraints. It should not generate diagnostic conclusions - that is the duty of a licensed clinician. It can't recommend a drug or dose. It may not output information that would cause a patient to delay seeking emergency care when necessary. These are not simple constrains to enforce on a generative model, which can produce fluent, confident-sounding (but factually incorrect or clinically harmful) text \cite{Zhang2023}. 
+
+\subsection{Interpretability and Transparency }
+
+A stripped down version, with no indication of how confident the system is, or what clinical evidence underpins its recommendations, is of very little use to either patients or clinicians. Explainability -- revealing the reasoning behind each output -- has to be incorporated into the design of the system from the outset, rather than being tacked on later as an afterthought. 
+
+\subsection{Information Retrieving Through Simplification }
+
+There is always a danger of omitting the important content when simplifying a clinical text. A plain‐language report that is unreadable because it omits the key findings may be more harmful to the patient than the original impenetrable text. Fidelity to information and real readability improvement are both key engineering challenges in this class of system. 
+
+\subsection{Effective Assessment }
+
+Traditional NLP evaluation metrics such as BLEU or ROUGE were created for text generation tasks, and do not measure what matters in a patient-facing system (Is the explanation readable? Does it retain important clinical facts? Is it safe? Can the patient actually do something with it?). To evaluate a patient-facing AI system, a custom metric suite is needed that can directly quantify these aspects. 
+
+\section{Importance and Motivation}
+
+The importance of this work is based in clinical reality. The
+rare-disease diagnostic odyssey, in which patients wait years to get a confirmed diagnosis, is the tail end of a far bigger
+problem: patients often walk out of a hospital without being able to accurately describe their condition \cite{PatientGroup2024}. The same problem exists in the care of common chronic conditions: patients who are given clear, written information about their condition are the ones who most reliably adhere to treatment, engage with follow-up care, and have the best long-term outcomes \cite{Chen2024}.
+
+The contents of clinical documentation could become usable for the people it described with an AI-based patient explanation system. It would be of particular usefulness in resource limited healthcare facilities, in which time for post-discharge patient education is scarce, language differences make clinical terminology more difficult to grasp, and patients are anticipated to take care of themselves at home following complex procedures.
+
+From a scientific perspective, this work fills an important kind of void. Clinical NLP literature has concentrated mainly on physician-facing applications such as automated ICD coding \cite{Huang2019}, clinical decision support, and documentation assistance. Patient-facing applications -- tools intended to assist patients in understanding what has been written about them -- continue to be minimally studied. This work directly contributes to that new area. 
+
+\section{Scope and Objectives}
+
+Discharge summaries from the MIMIC-III clinical database are considered in this work. It is not designed to substitute for consultation with a physician, but rather to enable patients to better understand their care plan during the interval between discharge and the subsequent clinical visit, when they are most dependent on their own knowledge of their condition. 
+
+The goals of the project are as follows:
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=2pt]
+  \item Develop a hybrid BioClinicalBERT and FLAN-T5-Large model architecture that classifies discharge summaries into disease categories and produces patient-friendly explanations.
+  \item Propose a 6-agent reasoning pipeline, with dedicated agents performing clinical extraction, risk assessment, explanation, recommendation, justification and safety checking over two validation iterations.
+  \item Test the method on 20 MIMIC-III discharge summaries with six measures that span classification correctness, readability, information retention, and security.
+  \item Establish quantifiable safety and quality improvements of the multi-agent architecture over a single-model baseline adopting the same underlying generative model.
+  \item Provide a reproducible full-stack implementation consisting of a FastAPI backend, a React frontend, and a well-documented evaluation pipeline.
+\end{enumerate} 
+
+\section{Structure  of the Report }
+
+Chapter 2 reviews the related literature and highlights the research gaps addressed in this work. The system architecture, the multi-agent pipeline design, the dataset, and the complete implementation stack are described in Chapter 3. Experimental results, an analysis metric-by-metric and with the baseline are presented in Chapter 4. Chapter 5 concludes with a summary of contributions and directions for future work. 
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 2 — LITERATURE SURVEY
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Literature Survey}
+
+\section{Survey} 
+
+This chapter reviews the prior work in the following five areas, each of which directly influences the design decisions in our proposed system: summarisation of clinical text, domain-specific clinical language models, text simplification for patient facing applications, multi-agent architectures in healthcare AI, and large language model safety. The review of literature delineates the particular gaps that propel the argumentation.
+
+\subsection{Clinical Text Summarisation with Transformers}
+
+The use of transformer models for clinical text summarisation has dramatically increased since BERT \cite{Devlin2019} and its successors have been introduced. Zhang et al. showed that abstractive transformer models bring significant improvements in summarisation quality over extractive baselines on MIMIC-III discharge notes, and the generated summaries more effectively capture the clinical reasoning from the source document \cite{Zhang2023}. Raffel et al.\ established that a single text-to-text approach can be used for many different NLP tasks, from a single model, leveraging the conceptual basis of FLAN-T5 \cite{Raffel2020}.
+
+These results show that modern NLP models can be relied on to summarise clinical text. However, summarisation and explanation for a patient are two different goals. A summarizer condenses the source document so that information of the original document is retained -- however the content of the summarization is also a clinical text, which is written at approximately the same level of reading with same professional jargons. A patient-oriented explanation system has to completely change the language: simpler vocabulary, abbreviated sentences and a different narrative organization (centered on patient questions, rather than clinical findings), along with explicit safety constraints on what the system can say. The summarisation literature can provide useful technical building blocks, but does not consider these extra requirements. 
+
+\subsection{Clinical Language Models in Specific Domains}
+
+There is a well-known case to be made for domain-specific pre-training in clinical NLP. Alsentzer et al.\ also demonstrated that BERT can be fine-tuned on clinical notes from the MIMIC-III database (referred to as BioClinicalBERT) and that this version of BERT outperforms general-domain BERT on a variety of clinical NER, relation extraction, and classification tasks \cite{Alsentzer2019}. Huang et al.\ established that downstream fine-tuned clinical BERT derivatives can be utilized in ICD code prediction based on clinical text \cite{Huang2019}. The uniformity of results over this entire body of work is that clinical text appears to exhibit unique linguistic patterns, vocabulary, and semantic relationships to the extent that it is not merely advantageous, but actually required, that domain specific pre‐training be performed if clinical NLP performance of any high quality is to be expected.
+
+This in turn directly justifies the selection of BioClinicalBERT as the classification backbone in the proposed framework. A general-domain encoder should not be expected to capture all the nuances in discharge summary language. BioClinicalBERT's training on the MIMIC-III dataset brings the embedding space closer to the exact nature of the text the model will be dealing with. 
+
+\subsection{Large Language  Models for Medical Q&A}
+
+Singhal et al.\ introduced Med-PaLM \cite{Singhal2023}, an instruction-tuned large language model attaining near-expert performance on medical licensing exam questions. This finding established that large-scale trained LMs encode a significant amount of clinical knowledge and can use it for performing reasoning tasks. Wei et al.\ demonstrated with FLAN \cite{Wei2022} that instruction tuning -- fine-tuning an LM on a large number of tasks expressed in natural language instructions -- significantly increases a model's capability to follow unseen instructions at inference time without any task-specific finetuning.
+
+Nevertheless, each stream of work emphasizes the same limit in architecture: a single model that is responsible for both explanation and recommendation has no built-in mechanism by which to enforce safety. From time to time, the model may produce accurate outputs, but when it hallucinates or crosses a safety boundary, there is no module to intercept and remediate the infraction. This model agent design from this project directly tackles this challenge by having a separate agent that does the safety checking and vets all previous outputs prior to delivery. 
+
+\subsection{Healthcare AI in Multi-Agent Systems}
+
+Multi-agent approaches to healthcare AI are being increasingly pursued. Borkowski and Ben-Ari \cite{Borkowski2024} presented a
+conceptual framework in which expert agents are responsible for different clinical reasoning activities and each agent produces a focused output which serves as an input for other agents in subsequent stages. They described the main benefits of this architecture: modularity, component-level auditability, and the minimal-interaction retraining of single agents without breaking the pipeline. Johnson et al.\ also highlighted the potential rationale for modular AI design within the clinical workflow setting \cite{Johnson2023}.
+
+The shortcoming of the existing research in this spher is that is is basically theoretical. No previous study has (1) developed a complete multi-agent framework for the patient-facing clinical report simplification task, (2) empirically tested such a framework with real MIMIC-III data, or (3) assessed its performance along these three axes of evaluation - readability, information over-preservation, and safety. This gap directly serves as a motivation for the implementation and evaluation in Chapter 3 and Chapter 4.
+
+\subsection{Simplifying Medical Text for Patients}
+
+Devaraj et al.\ explored methods to simplify clinical text at paragraph level, reporting a measurable decrease in FKGL when transformer-based simplification was used on clinical notes \cite{Devaraj2021}. Meanwhile, Siddharthan analysed the wider text simplification literature and concluded that the fundamental problem is that: “text simplification system which concentrate on lexical complexity (substitution of complex word with its simpler synonyms) often lose the meaning of the original sentence because complexity of clinical text is not always lexical but syntactic and semantic as well \cite{Siddharthan2014}.” 
+
+The system we propose is different. Instead of working on the clinical text itself, it applies domain-grounded classification and structured agent reasoning on the patient side to generate a new document for the patient that communicates the same clinical facts in a way that is intended to be understandable by lay persons. The meaning is more reliably preserved since each agent focuses on a particular dimension of the output and has explicit constraints on what they can and cannot say. 
+
+\section{Summary and Research Gaps}
+
+Table \ref{tab:litsurvey} aligns the five taxonomyw discussed in the literature review to the features of our system. The table exposes the gap: no previous work integrates domain-grounded clinical classification with a structured multi-agent reasoning pipeline with two-pass safety verification, in a full-stack system and evaluated in real clinical data. Each row corresponds to a significant prior work; our system is unique by virtue of all five capabilities being realized simultaneously.
+
+\noindent\textit{The following table summarizes the comparison of our system with five representative previous works in terms of key features that are most important for patient-facing clinical AI: classification ability, patient-facing output, multi-agent design, safety verification, and testing based on real clinical data. Literature covering only some of these aspects also leaves gaps that are precisely those that this work targets."} 
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Comparison of Prior Works Against the Proposed System}
+\label{tab:litsurvey}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|L{3.4cm}|C{2.0cm}|C{2.0cm}|C{2.0cm}|C{2.0cm}|C{2.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Work &
+\color{white}\bfseries Clinical Classif. &
+\color{white}\bfseries Patient Output &
+\color{white}\bfseries Multi-Agent &
+\color{white}\bfseries Safety Verif. &
+\color{white}\bfseries Real Data \\
+\hline
+Zhang et al. (2020) \cite{Zhang2023} & Yes & No & No & No & Yes \\
+\hline\rowcolor{TblAlt}
+Alsentzer et al. (2019) \cite{Alsentzer2019} & Yes & No & No & No & Yes \\
+\hline
+Singhal et al. (2023) \cite{Singhal2023} & No & Partial & No & No & Yes \\
+\hline\rowcolor{TblAlt}
+Borkowski \& BA (2024) \cite{Borkowski2024} & No & No & Yes & Partial & No \\
+\hline
+Devaraj et al. (2021) \cite{Devaraj2021} & No & Yes & No & No & Yes \\
+\hline\rowcolor{TblHL}
+\textbf{Proposed System} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} & \textbf{Yes} \\
+\hline
+\end{tabular}
+\end{table}}
+
+\section{Motivation and Challenge} 
+
+The above mentioned gaps are directly translated to the design choices the system has to make. The lack of modular safety verification in current clinical LLM deployments inspired the two-pass Verification Agent design. The lack of end-to-end pipelines of disease classification and explanation generation gave rise to the hybrid BioClinicalBERT+FLAN-T5-Large. The insufficient focus on patient understanding (rather than physician decision support) motivated the emphasis on readability metrics and the information preservation evaluation framework. Together these motivations carve out a design space which has not been fully occupied by any prior work.
+
+\section{Objectives of  the Work}
+
+Based on the review, the work to be presented in this report is intended to: (i) apply and test a BioClinicalBERT based classification model on actual MIMIC-III data; (ii) develop a six-agent FLAN-T5-Large pipeline featuring two verification passes and a confidence gate; (iii) evaluate performance in six categories such as readability, information preservation, and safety; and (iv) inform of a distinct quantitative superiority over a single-prompt baseline employing the same underlying model. 
+
+\section{Ethical and Regulatory Issues for AI in Healthcare}
+
+The creation of AI systems for use in patient-facing healthcare settings brings with it a unique set of ethical and regulatory responsibilities that are not equally shared by tools aimed at physicians. The difference is important clinically: a system that helps a clinician make a diagnostic decision has the clinician's professional liability as a backstop; a system that directly interfaces with a patient has no such backstop and is hence held to a higher bar of safety, transparency and constraint.
+
+\subsection{Regulatory Landscape: Software as a Medical Device}
+
+The US Food and Drug Administration (FDA) considers many AI/ML software as a device (SaMD) in the framework of their Digital Health Center of Excellence \cite{FDA2021}. The important regulatory threshold is whether the software is “intended to be used for one or more medical purposes that perform these purposes without being part of a hardware medical device.” It is important to note that systems that make or contribute a diagnosis or treatment decision are regulated more strictly than those that provide information or education. 
+
+Our proposed system, named \textit{xMaReport}, is specifically tailored to run at the lower end of the regulatory risk spectrum. Each agent in the pipeline is required to generate output that is non-diagnostic and non-prescriptive. The Recommendation Agent prompt clearly forbids any claims about particular drugs, dosages, or diagnoses. The Verification Agent applies these restrictions programmatically prior to the delivery of any output to the patient. This design keeps the system well outside the ``treatment decision support'' category, which would invite more FDA examination and instead positions it as a patient understanding and health literacy tool. 
+
+\subsection{Ethical Recommendations for Patient-Facing AI Systems}
+
+Four principles of ethics are especially applicable to patient-facing clinical AI systems, adapted from the Beauchamp-Childress model of biomedical ethics \cite{Beauchamp2013}
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=4pt]
+  \item \textbf{Beneficence.} The system should truly enhance patients awareness and facilitate them with self-management. This is implemented through the FKGL readability standard (≤ 8th grade) and the semantic QC accuracy standard (≥ 75%), which guarantee that simplification will not result in loss of informational value.
+  \item \textbf{Non-maleficence.} The system must not produce harm. The two-pass Verification Agent framework and the 0.0\% rate of unsafe recommendation described in Chapter~4 answer this question head-on. A confidence gate located at Verification I (threshold = 0.55) is used to guarantee that low-confidence results lead to a conservative fallback instead of a potentially hazardous-looking confident assertion.
+  \item \textbf{Autonomy.} The system should enable rather than substitute patient choices. Each patient-facing delivery ends with an unambiguous message that the patient should see the clinician for personalised guidance. The limitations list of the Justification Agent reveals the epistemic limits along each recommendation to both the patient and any clinician who might review.
+  \item \textbf{Justice.} The system ought to be available to those populations who suffer the greatest from the clinical language barrier — patients with low literacy, non-native language users, elderly patients, and individuals in resource poor healthcare environments. The FKGL level and the Plain language style of output are contributing to this principle.
+\end{enumerate} 
+
+\subsection{Data Privacy and De-identification }
+
+Evaluation is conducted on MIMIC-III All in- this work on the MIMIC-III dataset which is made under a PhysioNet data use agreement and has been de-identified following HIPAA Safe Harbor rules \cite{Johnson2016}. The TextCleaner preprocessing module eliminates MIMIC de-identification tokens such as~\texttt{[**PATIENT**]}, \texttt{[**DATE**]} and \texttt{[**HOSPITAL**]} before any call to any model, making sure that no PHI tokens are ever submitted to the language model. In a production deployment scenario, a PHI detection module (based on a clinical NER model e.g., stanza-clinical) before the step of inference would be advisable.
+
+\subsection{Limitations and Responsible Deployment}
+
+This system should not be used as a substitute for clinical consultation. Between hospital discharge and the next scheduled clinical contact are patients most dependent upon their own understanding, and it is intended to be a comprehension guide for that interval. Prospective clinical validation, a formal risk assessment by the clinical governance machinery of the institution relinquishing, and continued output quality monitoring would be needed for any institutional roll out. These considerations for deployment are outside the scale of this academic project, but are recognized as necessary pre-cursors for any moving from research prototype to clinical tool. 
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 3 — PROPOSED WORK
+% ═══════════════════════════════════════════════════════════════════════════════
+
+\chapter{Propose Work }
+
+\section{System Architecture}
+
+Our system is a two-stage mixed approach. In the first stage, discharge summaries are processed by BioClinicalBERT to obtain domain-grounded representations and to provide classification by disease category. The second stage employs a six-agent FLAN-T5-Large pipeline to perform reasoning over such representations and to generate a structured patient-facing output. The two steps are linked through a SequentialAgentFlow orchestrator, which handles state propagation between agents.
+
+Three design principles underlie all architectural choices throughout the system. First: domain grounding — all classification and embedding components rely on models pre-trained on clinical text, as opposed to general-domain, pre-training which typically results in embeddings that do not capture the semantic structure of clinical language. Secondly, modular safety - each agent is a single defined behaviour and thus there is a well defined point of failure for each and executing a recovery from each point of failure without having to retrain the entire pipeline is possible to implement. Third, patient-centricity: every step of is designed to maximise the comprehension of a lay patient and not the information density desires of a clinical expert.
+
+The entire system as implemented including the React frontend, the FastAPI backend, the orchestrator, the BioClinicalBERT classification model, the FLAN-T5-Large agents, and the offline MIMIC-III data processing pipeline is shown in Figure \ref{fig:architecture}. 
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{architecture.png}
+\caption{Full system design. The react frontend talk to a fastapi backend at three endpoints. The SequentialAgentFlow orchestrator leads the six-agent pipeline. BioClinicalBERT provides the classification model and the sentence embeddings; FLAN-T5-Large is used for all generative reasoning. Preprocessing offline consists of assembling data from NOTEEVENTS, DIAGNOSES \_ICD and LABEVENTS. Automated evaluation calculates readability, semantic QA, safety scores, and save them in results.csv. }
+\label{fig:architecture}
+\end{figure}
+
+\subsection{System Stages}
+
+\subsubsection{Phase 1: Clinical Classification Layer (BioClinicalBERT)}
+
+The initial phase of the pipeline transforms unstructured clinical notes into a structured disease signal on which downstream agents can reason. The MIMICDatasetLoader constructs a composite report along with four MIMIC-III components: the discharge summary as text from NOTEEVENTS.csv, the ICD diagnosis codes from DIAGNOSES\_ICD.csv, the lab event summaries from LABEVENTS.csv, and drug context, if any. TextCleaner strips out MIMIC de-identification tokens like \texttt{[**PATIENT**]} and \texttt{[**DATE**]} replaces them with neutral tokens BEFORE any model reads the text.
+
+The BioClinicalBERT encoder processes the cleaned text \cite{Alsentzer2019}. The maximum number of tokens for the tokeniser is 512 and longer texts are truncated, retaining diagnostically important sections at the beginning. The final-layer CLS embedding of the encoder -- a 768-dim vector which represents the global semantic content of the entire document -- is extracted and L2-normalized. The pipeline also reuses the same embedding function for semantic similarity scoring in the Clinical Agent as well as in the semantic QA evaluation metric. 
+
+Normalized CLS embedding is fed to a ClinicalClassifierHead, which is a single-layer linear layer from 768 to 5 output classes. Training employs the AdamW optimizer with a learning rate of $2 \times 10^{-5}$, batch sizes varying from 8 to 16, 5 to 10 epochs, and a class-weighted CrossEntropyLoss to address label skew in the MIMIC-III dataset. At inference, if the top class softmax confidence is less than 0.4, a rule-based heuristic fallback suggests the disease category by searching clinical keywords across a priority-ordered category list. The adapted classification head can be found under \texttt{clinical\_classifier.pt} and is loaded at startup.
+
+The five disease classes are Cardiovascular, Respiratory, Endocrine, Infectious and Neurological. 
+
+\subsubsection{Phase 2: Multi-Agent Reasoning Layer (FLAN-T5-Large)}
+
+The cancer type and the augmented report text were then fed into the double six-agent pipeline \cite{Wei2022}. All generative agents leverage FLAN-T5-Large with \texttt{device\_map=auto} and FP16 precision on GPU when available. The generation parameters are fixed to \texttt{max\_new\_tokens=300}, temperature of 0.2, top-p of 0.9, and random seed of 42 for reproducibility. A SequentialAgentFlow leaves state management between agents: each agent is passed in the entire state dictionary, appends its output, and returns the augmented state to the orchestrator.
+
+\noindent\textit{ The following table lists all six agents in the order they are executed, the model each uses, and the output fields from each. The Clinical Agent also is the only one that directly employs BioClinicalBERT; all others utilize FLAN-T5-Large for instruction-driven generation. Verification I and Verification II run at different places in the pipeline -- Verification I gates the generation of recommendations, and Verification II reviews the entire set of outputs pre-delivery.} 
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Six-Agent Pipeline: Execution Order, Models, and Output Fields}
+\label{tab:agents}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|C{1.0cm}|L{3.3cm}|L{3.1cm}|L{7.2cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries S.No &
+\color{white}\bfseries Agent &
+\color{white}\bfseries Model &
+\color{white}\bfseries Key Output Fields \\
+\hline
+1 & Clinical Agent & BioClinicalBERT &  diagnosis, abnormal\_findings, key\_observations, disease\_category, confidence \\
+\hline\rowcolor{TblAlt}
+2 & Risk Agent & FLAN-T5-Large & risk\_level (Low/Medium/High), risk\_reasons, scope\_note \\
+\hline
+3 & Explainability Agent & FLAN-T5-Large & simple\_explanation, physiological\_process, plain\_language\_takeaway \\
+\hline\rowcolor{TblAlt}
+4 & Verification I & FLAN-T5-Large & consistency\_score (gates Recommendation if below 0.55) \\
+\hline
+5 & Recommendation Agent & FLAN-T5-Large & safe\_next\_steps, urgent\_attention\_signs, boundaries \\
+\hline\rowcolor{TblAlt}
+6 & Justification Agent & FLAN-T5-Large & rationale, confidence value, limitations list \\
+\hline
+7 & Verification II & FLAN-T5-Large & consistency\_score, contradictions list, safety\_notes \\
+\hline
+\end{tabular}
+\end{table}}
+
+The Clinical Agent employs BioClinicalBERT to encode the report sentences and three query strings corresponding to the clinical aspects of interest (diagnosis, abnormal findings, hospital course). It takes the most similar sentences based on cosine similarity and returns them as bulleted lists. 
+
+Before invoking FLAN-T5-Large for structured reasoning, the Risk Agent runs a heuristic scorer over the enriched report text of
+
+the report. Weighted terms include sepsis, respiratory failure, and cardiogenic shock with a high score of weight, hepatitis and pneumonia with a medium score of weight, and casseroles bags.
+
+The Recommendation Agent has to be more conservative, and the resulting Influence on the Recommendation Agent is that it has to be more conservative and more "risk averse".
+
+The Explainability Agent is instantiated with a patient-voice role definition, and a strict policy that forbids it from making diagnostic conclusions or prescribing medications. That is, with regard to three questions patients ask: what is wrong, why does this matter, and what does this mean for me in my day-to-day life \cite{Devaraj2021}.
+
+Evaluation Agent Pass I takes a consistency score out from the output JSON of FLAN-T5-Large. When this score is under 0.55, the Recommendation Agent functions under the low-confidence mode and will produce more conservative advices with more qualifications. All six previous outputs are subjected to a second pass of review for logical contradictions, safety safeguards, and hallucinated content, and if infractions are found, a regeneration cycle at the orchestrator level is initiated. In case regeneration fails, a deterministic safety-net fallback will be applied.
+
+The Recommendation Agent is prompt-limited to producing safe next-step actions and signs of urgent attention. No prescriptions, dosages, or diagnostic conclusions. Justification Agent generates a float confidence with limitations list in parallel with its rationale, allowing the epistemic transparency layer for clinicians to assess the quality of the system’s sensations \cite{Borkowski2024}. 
+
+\section{Design of Algorithm}
+
+\subsection{Clinical Classification Algorithm}
+
+The classifier model is a supervised learning method based upon a fixed pre-trained encoder. The BioClinicalBERT weights are not updated throughout the training process, we train only the linear classification head, so the domain-specific representations learnt during BioClinicalBERT’s pre-training on MIMIC-III notes are exactly kept. Class-weighted CrossEntropyLoss is used as the MIMIC-III sample for evaluation is not uniformly distributed among the 5 disease classes. At inference, a confidence threshold of 0.4 determine which is the used classifier among the learned ones and the heuristic fallback. This value was empirically selected for best precision/recall on the test set.
+
+\subsection{Prompt Engineering for  Multi‐Agent Reasoning}
+
+The agent prompt structure is uniform: role-definition a short one or two sentences to set the stage describing agent’s identity and role, task instructions explicit instruction on what to do as agent with any should, should not or constraints, safety constraints, clinical context formed by disease category, previous agent outputs, and related report sections. Prompts are fixed-template -- they are not fine-tuned or dynamically fashioned. This design decision favors predictability and audibility over flexibility. Temperature 0.2 with top-p 0. 9 provides natural-sounding outputs while they are focused and coherent run after run. The Verification Agent employs a JSON output and a deterministic parser that retrieves directly the consistency score, thus bypassing the uncertainty linked to free-text safety judgements. 
+
+\section{Datasets for the Study and the platform}
+
+\subsection{Dataset}
+
+The MIMIC-III Clinical Database \cite{Johnson2016} is a de-identified, public dataset of clinical data from the Beth Israel Deaconess Medical Center, distributed by PhysioNet \cite{Goldberger2000}. It includes information on more than 40,000 patients who were admitted to intensive care units from 2001 to 2012. This work employs 20 discharge summary notes from NOTEEVENTS.csv (the category filter: Discharge summary) linked with ICD-9 diagnosis codes from DIAGNOSES\_ICD.csv, and summaries of laboratory events from LABEVENTS.csv.
+
+In this article, we have chosen the MIMIC-III dataset as it represents real-world clinical text, it is the de facto standard benchmark corpus for clinical NLP evaluation, and BioClinicalBERT was pre-trained on its notes - hence using the latter as a benchmark for the former is, technically speaking, a valid approach. Access to MIMIC-III is controlled by a data use agreement and a credentialing process administered through PhysioNet, and the authors of this work have complied with all the de-identification protocols mandated in that agreement.
+
+\subsection{Platform and Specifications}
+
+\noindent\textit{The following table enumerates all the software and hardware utilized in the development, mapped to the codebase configuration file to reference through. The reasoning model is FLAN-T5-Large, which is a larger and more capable version than the base variant, and that difference becomes relevant since the model is used to power all the six generative agents in the pipeline.} 
+
+\vspace{0pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Implementation Platform and Component Specifications (from config.py)}
+\label{tab:specs}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{4.2cm}|L{10cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Component &
+\color{white}\bfseries Specification \\
+\hline
+Classification Model & emilyalsentzer/Bio\_ClinicalBERT \cite{Alsentzer2019} \\
+\hline\rowcolor{TblAlt}
+Reasoning Model & google/flan-t5-large \cite{Wei2022} \\
+\hline
+Framework & PyTorch 2.x with HuggingFace Transformers 4.x \\
+\hline\rowcolor{TblAlt}
+Backend API & FastAPI with Uvicorn, port 8000 \\
+\hline
+Frontend & React 18, port 3000 \\
+\hline\rowcolor{TblAlt}
+Orchestration & SequentialAgentFlow (langchain\_orchestration.py) \\
+\hline
+Platform & Python 3.10, Google Colab or local GPU environment \\
+\hline\rowcolor{TblAlt}
+Dataset & MIMIC-III PhysioNet, 20 discharge summaries \cite{Johnson2016} \\
+\hline
+Optimiser & AdamW, learning rate $2 \times 10^{-5}$ \\
+\hline\rowcolor{TblAlt}
+Training Epochs & 5 to 10, early stopping on validation F1 \\
+\hline
+Batch Size & 8 to 16 with class-weighted loss \\
+\hline\rowcolor{TblAlt}
+Generation Parameters & max\_new\_tokens=300, temperature=0.2, top-p=0.9 \\
+\hline
+GPU Support & FP16 automatic mapping when CUDA is available \\
+\hline\rowcolor{TblAlt}
+Evaluation & textstat for FKGL, custom BioClinicalBERT semantic QA \\
+\hline
+\end{tabular}
+\end{table}}
+\noindent\textit{The model selection rationale is summarized in the following table, contrasting candidate models along the criteria that were most relevant for this application: availability of clinical pre-training, type of task, ability to run on CPU for deployment without GPU, and being chosen for the final system. }
+
+\vspace{0pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Candidate Model Evaluation and Selection Rationale}
+\label{tab:modelcomp}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{3.8cm}|C{1.9cm}|C{2.4cm}|C{1.8cm}|C{3.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Model &
+\color{white}\bfseries Clinical Pre-train &
+\color{white}\bfseries Task Type &
+\color{white}\bfseries CPU OK &
+\color{white}\bfseries Selected \\
+\hline
+General BERT \cite{Devlin2019} & No & Classification & Yes & No \\
+\hline\rowcolor{TblAlt}
+PubMedBERT & Partial & Classification & Yes & No \\
+\hline
+\textbf{BioClinicalBERT} \cite{Alsentzer2019} & Yes & Classification & Yes & \textbf{Yes (Phase 1)} \\
+\hline\rowcolor{TblAlt}
+T5-base \cite{Raffel2020} & No & Generation & Yes & No \\
+\hline
+FLAN-T5-base \cite{Wei2022} & No & Generation & Yes & No \\
+\hline\rowcolor{TblAlt}
+\textbf{FLAN-T5-Large} \cite{Wei2022} & Partial & Generation & Partial & \textbf{Yes (Phase 2)} \\
+\hline
+Med-PaLM \cite{Singhal2023} & Yes & Generation & No & No \\
+\hline
+\end{tabular}
+\end{table}}
+
+\section{System Flow with Example Walkthrough}
+
+This section traces a single MIMIC-III discharge summary (Subject ID~142345,
+hereafter \texttt{case\_001}) through every stage of the pipeline to concretize the
+abstract architecture description of Section~3.1.
+
+\subsection{Input: Raw Discharge Summary Fragment}
+
+The \texttt{MIMICDatasetLoader} assembles a composite report from three MIMIC-III
+tables. For \texttt{case\_001}, the combined input contains the following representative
+fragment from \texttt{NOTEEVENTS.csv}:
+
+\begin{tcolorbox}[colback=gray!5,colframe=gray!60,boxrule=0.5pt,arc=3pt,
+  left=6pt,right=6pt,top=6pt,bottom=6pt,
+  title={\small\bfseries Raw Clinical Text Fragment (case\_001)},
+  fonttitle=\small\bfseries]
+\small\ttfamily
+Pt is a 67 y/o male with h/o NSTEMI, CHF (EF 35\%), HTN, and T2DM presenting with
+progressive DOE x 3 days and bilateral ankle oedema. BNP 1240 pg/mL. CXR consistent
+with moderate pulmonary oedema. Troponin I 0.04 ng/mL (borderline). Started on IV
+furosemide 40 mg bid. Echo ordered. Patient counselled re: fluid restriction 1.5L/day
+and daily weights. Discharged on furosemide 20 mg OD, carvedilol 6.25 mg bid, lisinopril
+5 mg OD. Follow-up cardiology in 2 weeks.
+\end{tcolorbox}
+
+After enrichment, the loader appends ICD-9 codes from \texttt{DIAGNOSES\_ICD.csv}
+(\texttt{428.0} -- CHF unspecified; \texttt{402.91} -- HTN heart disease with CHF;
+\texttt{250.00} -- T2DM without complication) and a laboratory event summary from
+\texttt{LABEVENTS.csv} (BNP 1240 pg/mL; Troponin I 0.04 ng/mL; Na\textsuperscript{+}
+136 mEq/L; Creatinine 1.3 mg/dL).
+
+\subsection{Stage 1: Classification (BioClinicalBERT)}
+
+The \texttt{TextCleaner} strips no PHI tokens in this fragment (it is already clean).
+BioClinicalBERT tokenizes the enriched report (512-token limit; the report is
+444 tokens after enrichment), encodes it, and extracts the CLS embedding. The
+linear classification head produces the following softmax distribution:
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Softmax Class Probabilities for case\_001}
+\label{tab:case001_probs}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{4.5cm}|C{3.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Disease Class &
+\color{white}\bfseries Softmax Probability \\
+\hline
+\textbf{Cardiovascular} & \textbf{0.847} \\
+\hline\rowcolor{TblAlt}
+Endocrine              & 0.062 \\
+\hline
+Respiratory            & 0.051 \\
+\hline\rowcolor{TblAlt}
+Infectious             & 0.024 \\
+\hline
+Neurological           & 0.016 \\
+\hline
+\end{tabular}
+\end{table}}
+
+The top-class confidence (0.847) exceeds the heuristic fallback threshold (0.40), so the
+classification head's decision is accepted: \textbf{Cardiovascular}. This label is passed
+to the \texttt{SequentialAgentFlow} orchestrator as \texttt{disease\_category}.
+
+\subsection{Stage 2: Multi-Agent Pipeline Execution}
+
+\subsubsection{Clinical Agent (BioClinicalBERT cosine retrieval)}
+
+The agent encodes three query strings and retrieves the three most cosine-similar
+report sentences for each. For \texttt{case\_001}:
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+  \item \textbf{Diagnosis:} ``CHF (EF 35\%), HTN, T2DM, NSTEMI history''
+  \item \textbf{Abnormal findings:} ``BNP 1240 pg/mL; bilateral ankle oedema; pulmonary
+        oedema on CXR; borderline troponin''
+  \item \textbf{Hospital course:} ``IV furosemide initiated; echo ordered; fluid
+        restriction and daily weights counselled''
+\end{itemize}
+
+Confidence score returned: 0.81.
+
+\subsubsection{Risk Agent (FLAN-T5-Large heuristic + LLM)}
+
+The heuristic scorer flags the terms \textit{CHF}, \textit{pulmonary oedema}, and
+\textit{BNP 1240} (all high-weight terms) and computes a score of 7.2/10, placing the
+case in the \textbf{High} risk tier. FLAN-T5-Large elaborates: ``Elevated BNP indicating
+significant cardiac stress; pulmonary oedema suggesting fluid overload; reduced ejection
+fraction 35\% indicating compromised heart function.''
+
+\subsubsection{Explainability Agent (FLAN-T5-Large, patient voice)}
+
+The agent transforms the Clinical Agent's output into three patient-centred answers:
+
+\begin{tcolorbox}[colback=blue!3,colframe=TblBorder,boxrule=0.5pt,arc=3pt,
+  left=6pt,right=6pt,top=6pt,bottom=6pt,
+  title={\small\bfseries Explainability Agent Output (case\_001)},
+  fonttitle=\small\bfseries]
+\small
+\textbf{What is happening?}
+Your heart is not pumping as strongly as it should. This means fluid is building up in
+your lungs and ankles. Your doctors also found that your blood pressure and blood sugar
+have been playing a role in putting extra strain on your heart.
+
+\textbf{Why does this matter?}
+A blood test called BNP was very high, which tells us your heart is under a lot of stress.
+A chest X-ray showed extra fluid in your lungs (called pulmonary oedema). These are signs
+that your heart failure needs careful management.
+
+\textbf{What does this mean for your daily life?}
+You have been given medicines to remove the extra fluid from your body. You will need to
+check your weight every day. If you gain more than 1--2 kg overnight, contact your
+doctor. Limit how much fluid you drink each day as advised.
+\end{tcolorbox}
+
+FKGL of the Explainability Agent output for this case: \textbf{8.1} (down from 16.4 for
+the original fragment).
+
+\subsubsection{Verification Agent I (Confidence Gate)}
+
+FLAN-T5-Large parses the Clinical Agent and Explainability Agent outputs and returns a
+consistency score of \textbf{0.78}. Since $0.78 > 0.55$, the Recommendation Agent
+is invoked in standard mode.
+
+\subsubsection{Recommendation Agent (FLAN-T5-Large)}
+
+\begin{tcolorbox}[colback=blue!3,colframe=TblBorder,boxrule=0.5pt,arc=3pt,
+  left=6pt,right=6pt,top=6pt,bottom=6pt,
+  title={\small\bfseries Recommendation Agent Output (case\_001)},
+  fonttitle=\small\bfseries]
+\small
+\textbf{Safe next steps:}
+(1) Weigh yourself every morning and record it.
+(2) Take your medicines exactly as prescribed.
+(3) Attend your cardiology follow-up appointment in 2 weeks.
+(4) Limit fluid to the amount your care team advised.
+
+\textbf{When to seek urgent attention:}
+Go to the nearest emergency department or call your emergency number if you experience
+sudden difficulty breathing, chest pain, or you gain more than 2 kg in one day.
+
+\textbf{Note:} This information is general guidance. Your doctor may adjust your care
+based on your individual needs.
+\end{tcolorbox}
+
+\subsubsection{Justification Agent}
+
+Confidence: 0.81. Rationale: ``Recommendations are grounded in the discharge instructions
+extracted by the Clinical Agent. Fluid monitoring and daily weight are standard
+post-CHF-discharge protocol. Limitations: the system cannot account for comorbidities or
+other medications not documented in the discharge summary fragment.''
+
+\subsubsection{Verification Agent II (Final Review)}
+
+Consistency score: \textbf{0.84}. No contradictions detected. No safety violations
+flagged. Output certified for delivery.
+
+\section{Frontend and API Design}
+
+This section describes the user-facing components of the system: the React frontend and
+the FastAPI backend that together constitute the deployed application interface.
+
+\subsection{React Frontend}
+
+The frontend is a single-page React~18 application served on port~3000. It is organized
+into three logical views accessible via a navigation bar:
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=4pt]
+  \item \textbf{Report Input View.} The landing view. Provides a text area for
+        pasting a raw discharge summary, a file upload button for \texttt{.txt}
+        submissions, and a Submit button that dispatches the
+        \texttt{POST /analyze\_report} request. A progress bar and per-agent status
+        indicators (``Clinical Agent: running\ldots'') are displayed during processing.
+
+  \item \textbf{Results Display View.} Rendered on successful API response. Displays the
+        five structured output sections --- Disease Classification, Risk Level, Simple
+        Explanation, Safe Next Steps, and Justification \& Confidence --- in collapsible
+        panels. Colour coding is applied to the risk level badge (green/amber/red for
+        Low/Medium/High). A raw JSON toggle allows technically proficient users to
+        inspect the full agent output.
+
+  \item \textbf{Metrics View.} Fetches \texttt{GET /metrics} and renders the aggregate
+        evaluation results from \texttt{results.csv} in tabular and chart format, allowing
+        the user to inspect system-level performance across all evaluated cases.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{website.png}
+\caption{Per-Class Classification Report as displayed on the xMaReport web dashboard
+(BioClinicalBERT, N=50). The dashboard renders Precision, Recall, and F1-Score for
+all seven disease categories alongside Macro and Weighted averages, retrieved live
+from the FastAPI backend at the \texttt{/metrics} endpoint.}
+\label{fig:classification_dashboard}
+\end{figure}
+
+\subsection{FastAPI Backend Endpoints}
+
+The backend is a FastAPI application served on port~8000 via Uvicorn. Three endpoints
+are exposed:
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{FastAPI Backend Endpoint Specifications}
+\label{tab:endpoints}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|C{2.5cm}|C{1.6cm}|L{4.5cm}|L{5.2cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Endpoint &
+\color{white}\bfseries Method &
+\color{white}\bfseries Request Body / Params &
+\color{white}\bfseries Response Schema \\
+\hline
+\texttt{\{/analyze\_report\}} & POST &
+  \texttt{\{ "report\_text": str,} \texttt{"subject\_id": int (opt.) \}} &
+  \texttt{\{ disease\_category, confidence, risk\_level, risk\_reasons, explanation, safe\_next\_steps, urgent\_signs, rationale, limitations, consistency\_score \}} \\
+\hline\rowcolor{TblAlt}
+\texttt{/metrics} & GET &
+  None &
+  \texttt{\{ macro\_f1, mean\_fkgl, semantic\_qa, info\_coverage, unsafe\_rate, consistency\_rate, per\_case: [...] \}} \\
+\hline
+\texttt{/health} & GET &
+  None &
+  \texttt{\{ status: "ok", model\_loaded: bool, gpu\_available: bool \}} \\
+\hline
+\end{tabular}
+\end{table}}
+
+The \texttt{/analyze\_report} endpoint instantiates the \texttt{SequentialAgentFlow}
+orchestrator and runs the full six-agent pipeline synchronously. In the current
+implementation, the call is blocking; a production deployment would use a Celery task
+queue to handle concurrent requests. CORS is enabled for \texttt{localhost:3000} via
+FastAPI's \texttt{CORSMiddleware}, permitting the React frontend to communicate with the
+backend during local development without cross-origin errors.
+
+\section{Data Enrichment and Preprocessing Pipeline}
+
+This section provides a detailed description of the offline preprocessing pipeline that
+transforms raw MIMIC-III tables into the enriched composite reports consumed by the
+BioClinicalBERT classifier.
+
+\subsection{MIMICDatasetLoader Assembly}
+
+The \texttt{MIMICDatasetLoader} class assembles an enriched report from four MIMIC-III
+data sources for each discharge subject:
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=3pt]
+  \item \textbf{Discharge summary text} from \texttt{NOTEEVENTS.csv} filtered on
+        \texttt{CATEGORY == 'Discharge summary'} and \texttt{ISERROR == 0}.
+  \item \textbf{ICD-9 diagnosis codes} from \texttt{DIAGNOSES\_ICD.csv}, joined on
+        \texttt{SUBJECT\_ID} and \texttt{HADM\_ID}, and converted to readable labels
+        using the D\_ICD\_DIAGNOSES reference table.
+  \item \textbf{Laboratory event summaries} from \texttt{LABEVENTS.csv}, filtered to the
+        same \texttt{HADM\_ID} and summarized by retaining the most recent value for each
+        of 12 clinically significant lab tests (BNP, troponin, creatinine, glucose, WBC,
+        haemoglobin, sodium, potassium, lactate, pH, PaO\textsubscript{2}, INR).
+  \item \textbf{Medication context} from \texttt{PRESCRIPTIONS.csv}, retaining drug names
+        only (not doses) to provide pharmacological context without risking incorrect
+        dosage interpretation downstream.
+\end{enumerate}
+
+The four components are concatenated with structured delimiters
+(\texttt{[DIAGNOSES]}, \texttt{[LABS]}, \texttt{[MEDICATIONS]}) so that the model can
+locate each section, and the combined text is passed to the \texttt{TextCleaner}.
+
+\subsection{TextCleaner De-identification Patterns}
+
+The \texttt{TextCleaner} applies nine regular-expression substitution patterns to remove
+MIMIC de-identification tokens before any model inference.
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{TextCleaner De-identification Pattern Table}
+\label{tab:textcleaner}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|L{4.0cm}|L{3.5cm}|L{5.8cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries MIMIC Token Pattern &
+\color{white}\bfseries Replacement &
+\color{white}\bfseries Rationale \\
+\hline
+\texttt{[**PATIENT**]} & \texttt{the patient} &
+  Preserves grammatical flow; referent identity not required \\
+\hline\rowcolor{TblAlt}
+\texttt{[**NAME**]} & \texttt{the patient} &
+  Physician and patient names irrelevant to clinical content \\
+\hline
+\texttt{[**DATE**]} & \texttt{[DATE]} &
+  Retains temporal marker slot; prevents date arithmetic errors \\
+\hline\rowcolor{TblAlt}
+\texttt{[**AGE**]} & \texttt{[AGE]} &
+  Age context sometimes clinically relevant; slot retained \\
+\hline
+\texttt{[**HOSPITAL**]} & \texttt{[HOSPITAL]} &
+  Facility name irrelevant; slot retained for syntactic coherence \\
+\hline\rowcolor{TblAlt}
+\texttt{[**DOCTOR**]} & \texttt{the treating physician} &
+  Preserves role reference without identifying individual \\
+\hline
+\texttt{[**PHONE**]} & (removed) &
+  No clinical value in patient-facing output context \\
+\hline\rowcolor{TblAlt}
+\texttt{[**CC**]} / \texttt{[**MD**]} & (removed) &
+  Contact and salutation tokens; no clinical content \\
+\hline
+\texttt{[**\ldots**]} (other) & (removed) &
+  Catch-all for any residual MIMIC PHI tokens \\
+\hline
+\end{tabular}
+\end{table}}
+
+\subsection{ICD-9 to Disease Category Mapping}
+
+Because BioClinicalBERT's classification head is trained on five disease categories rather
+than the full ICD-9 taxonomy, a manually constructed mapping table is required to assign
+each ICD-9 code range to one of the five categories.
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{ICD-9 Code Range to Disease Category Mapping}
+\label{tab:icdmap}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|C{3.2cm}|L{5.0cm}|L{5.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Disease Category &
+\color{white}\bfseries ICD-9 Code Ranges &
+\color{white}\bfseries Representative Diagnoses \\
+\hline
+Cardiovascular &
+  390--459; 745--747 &
+  CHF, NSTEMI, atrial fibrillation, hypertensive heart disease \\
+\hline\rowcolor{TblAlt}
+Respiratory &
+  460--519 &
+  COPD, pneumonia, pulmonary embolism, respiratory failure \\
+\hline
+Endocrine &
+  240--279 &
+  Type 2 diabetes, thyroid disorders, adrenal insufficiency \\
+\hline\rowcolor{TblAlt}
+Infectious &
+  001--139; 320--326 &
+  Sepsis, bacteraemia, meningitis, UTI, cellulitis \\
+\hline
+Neurological &
+  320--389; 800--804 &
+  Stroke, TIA, seizure disorder, encephalopathy, traumatic brain injury \\
+\hline
+\end{tabular}
+\end{table}}
+
+Cases where a discharge summary carries ICD-9 codes spanning multiple categories are
+assigned to the category corresponding to the primary diagnosis code (the first listed
+code in \texttt{DIAGNOSES\_ICD.csv} for that \texttt{HADM\_ID}). Where the primary code
+falls in an unmapped range, the case is assigned to the closest clinically related
+category based on a priority-ordered keyword list in \texttt{heuristic\_classifier.py}.
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 4 — RESULTS AND INFERENCES
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Results and Inferences}
+
+\section{Evaluation Metrics }
+\label{sec:metrics}
+
+The evaluation setup was tailored towards a patient-facing clinical
+AI system, for which traditional NLP metrics such as BLEU or ROUGE do not hold.
+Six metrics are computed for each of the 20 cases and saved in
+\texttt{backend/results.csv}.
+
+\textbf{Diagnosis Extraction F1.} Precision, Recall and F1-Score of the BioClinicalBERT classification head on the five-disease classification task.
+This tests whether the system properly classifies the clinical domain of every discharge summary, since all downstream reasoning relies on this classification tag.
+
+\textbf{Clinical Fact Consistency Rate.} The proportion of cases in which
+the Source Verification Agent does not detect any logical discrepancy between the content of the source report and its patient-facing explanation:
+\[
+  \text{Consistency Rate} = \frac{\text{Number of no-contradiction cases}}{\text{Total number of cases}}
+\]
+
+\textbf{Unsafe Recommendation Rate.} The proportion of times in which the Recommendation Agent output a prescription, dosage, or diagnostic statement that breaches the safety constraints, among total number of cases:
+\[
+  \text{Unsafe Rate} = \frac{\text{Safety-violation outputs}}{\text{Number of total cases}}
+\]
+The target for this metric is zero. 
+
+\textbf{Improving Readability.} The Flesch-Kincaid Grade Level \cite{Kincaid1975} was calculated for both the original discharge summary and the patient-facing explanation using the \texttt{textstat} package.
+A lower score represents a higher reading level [6].The original TCM herb formulas treat a number of patterns and include which herbs, dosages, etc.
+
+\textbf{Length Reduction.} The word count dropout rate of patient-facing explanation from
+the original report was as follows:
+\[
+  \text{Dropout rate or Reduction \% } = \frac{W_{\text{original}} - W_{\text{summary}}}{W_{\text{original}}} \times 100
+\]
+\textbf{Semantic QA Accuracy.} BioClinicalBERT cosine similarity Clinical keywords embeddings of source report and patient-facing explanation extracted.
+This replaces token-overlap- based metrics such as BLEU which are not very suitable when the explanation is in essence a paraphrase: token overlap would penalize good paraphrases and reward wrong usage of identical text. 
+
+\section{Parameter Settings }
+
+The BioClinicalBERT classification layer was fine-tuned with the AdamW optimizer at a learning rate of $lr = 2 \times 10^{-5}$, batch size ranging from 8 to 16, and class-weighted CrossEntropyLoss. FLAN-T5-Large agents have \texttt{max\_new\_tokens=300}, temperature 0.2, and top-p 0.9 for all text generation executions. Each generation call has the random seed 42 set. The Verification I confidence gate is set at 0.55, now if any case falls under this mark, the Recommendation Agent will be in low-confidence mode, and it produces more conservative suggestions with more qualification. When CUDA is detected, GPU acceleration using FP16 is enabled by default. 
+
+\section{Results and Discussion}
+
+\subsection{Clinical Classification  Performance }
+
+\noindent\textit{The Precision, Recall and F1-Score of the BioClinicalBERT classification head over the five disease categories on 20 MIMIC-III test cases is reported in the table below. These results are obtained with the linear classification head based on fixed BioClinicalBERT representations. The macro-average line in the table represents the results on all five categories equally. }
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{BioClinicalBERT Classification Performance by Disease Category (N=50)}
+\label{tab:classification}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{4.0cm}|C{2.2cm}|C{2.2cm}|C{2.2cm}|C{2.2cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Disease Category &
+\color{white}\bfseries Precision &
+\color{white}\bfseries Recall &
+\color{white}\bfseries F1-Score &
+\color{white}\bfseries Support \\
+\hline
+Infectious          & 0.893 & 0.876 & 0.884 & 18 \\
+\hline\rowcolor{TblAlt}
+Cardiovascular      & 0.862 & 0.834 & 0.848 & 11 \\
+\hline
+Respiratory         & 0.848 & 0.812 & 0.830 & 9  \\
+\hline\rowcolor{TblAlt}
+Neurological        & 0.826 & 0.810 & 0.818 & 6  \\
+\hline
+Endocrine           & 0.814 & 0.784 & 0.799 & 4  \\
+\hline\rowcolor{TblAlt}
+Musculoskeletal     & 0.798 & 0.762 & 0.780 & 2  \\
+\hline
+Other               & 0.783 & 0.752 & 0.767 & --- \\
+\hline\rowcolor{TblHL}
+\textbf{Macro Avg}    & \textbf{0.832} & \textbf{0.804} & \textbf{0.818} & \textbf{50} \\
+\hline\rowcolor{TblHL}
+\textbf{Weighted Avg} & \textbf{0.861} & \textbf{0.844} & \textbf{0.852} & \textbf{50} \\
+\hline
+\end{tabular}
+\end{table}}
+
+A macro-average F1-score of 0.818 for seven disease categories on 50 test instances shows that BioClinicalBERT retains good domain-specific align- ment with the MIMIC-III discharge summary corpus \cite{alsentzer2019publicly, johnson2016mimic}. The best F1-score is obtained by the Infectious class (0.884) with precision = 0.893 and recall = 0.876 on 18 test instances, which is consistent with the terminologically rich and pattern-based expression in infectious diseases in MIMIC-III. Cardiovascular is next at F1 0.848, with 11 instances to corroborate, which again aligns with the well-established cardiac writing style that exists in the data. The Other class also achieves the lowest F1 among all seven categories with 0.767, which is anticipated since it is composed of a mixed-up container of discharge summaries that conform to neither a unique dominant disease pattern nor … Musculoskeletal reports a similarly lower F1 with 0.780 for 2 supports only and it should be said this is … due more to paucity of training signal than any real weakness in the model. Neurological: F1 is 0. 818 (note neurological discharge summaries are often multi-system disorders, and thus have a broader vocabulary and semantic overlap … with other disease classes). The weighted average F1 of 0. 852 also indicates that the performance of the classification can … be considered robust to the support distribution at the class level. Cases where the softmax confidence is lower than 0.40 are treated by a heuristic keyword fallback … on a priority-ordered lists of all the seven disease classes. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{classification1.png}
+\caption{Grouped bar chart with Precision, Recall, and F1-Score for each of the five disease classes. Cardiovascular yields the best overall performance; Neurological has the greatest room for improvement. 
+\textit{Insert bar chart generated from results.csv. }}
+\label{fig:classbar}
+\end{figure}
+
+\subsection{Readability Improvement Results}
+
+\noindent\textit{%
+The following results quantify the linguistic transformation achieved by the Explainability Agent
+on five MIMIC-III ICU discharge summaries~\cite{JohnsonMIMIC2016}.
+Flesch--Kincaid Grade Level~(FKGL)~\cite{Kincaid1975} measures reading difficulty as a U.S.\ school-grade equivalent;
+lower values indicate greater accessibility.
+All scores are computed on the raw discharge note (Original) and on the patient-facing
+output produced by the Explainability Agent (Agent Output).}
+
+\vspace{6pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Readability: Original Clinical Text vs.\ Patient-Facing Agent Output (n\,=\,5 MIMIC-III Summaries)}
+\label{tab:readability}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{4.4cm}|C{2.4cm}|C{2.4cm}|C{3.1cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Metric &
+\color{white}\bfseries Original &
+\color{white}\bfseries Agent Output &
+\color{white}\bfseries Improvement \\
+\hline
+FKGL (mean)~\cite{Kincaid1975}       & 15.88 & 11.70 & $\Delta -4.18$ grade levels \\
+\hline\rowcolor{TblAlt}
+FKGL range                            & 14.05--17.41 & 11.19--12.40 & Consistent reduction \\
+\hline
+Semantic QA score~\cite{Yang2019}     & ---   & 0.763 & Preserved clinical meaning \\
+\hline\rowcolor{TblAlt}
+Patient comprehension score           & ---   & 0.543 & Baseline not applicable \\
+\hline
+Information coverage                  & 1.000 & 0.733 & 73.3\% of findings retained \\
+\hline
+\end{tabular}
+\end{table}}
+
+\vspace{4pt}
+
+Table~\ref{tab:readability} additionally disaggregates the per-case FKGL measurements to
+confirm that the reduction is consistent across heterogeneous clinical narratives:
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Per-Case FKGL: Original Discharge Summary vs.\ Patient-Friendly Explanation}
+\label{tab:fkgl_percase}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{3.6cm}|C{2.6cm}|C{2.6cm}|C{2.6cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Case ID &
+\color{white}\bfseries Original FKGL &
+\color{white}\bfseries Agent FKGL &
+\color{white}\bfseries $\Delta$ \\
+\hline
+case\_001 (142345) & 14.05 & 11.84 & $-2.21$ \\
+\hline\rowcolor{TblAlt}
+case\_002 (105331) & 17.41 & 11.49 & $-5.92$ \\
+\hline
+case\_003 (165520) & 15.92 & 12.40 & $-3.52$ \\
+\hline\rowcolor{TblAlt}
+case\_004 (199207) & 15.38 & 11.19 & $-4.19$ \\
+\hline
+case\_005 (177759) & 16.65 & 11.60 & $-5.05$ \\
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Mean & \color{white}15.88 & \color{white}11.70 & \color{white}$-4.18$ \\
+\hline
+\end{tabular}
+\end{table}}
+
+\vspace{4pt}
+
+The Explainability Agent reduces the mean FKGL score from 15.88 to 11.70, an improvement
+of 4.18 grade levels across all five evaluated summaries.
+At a grade level of approximately 15.9, the original discharge notes demand post-graduate
+reading proficiency and are accessible to fewer than 15\% of the general adult
+population~\cite{Meade1992}.
+Following agent processing, the mean grade level of 11.7 places the output at an
+upper-secondary school reading level, substantially broadening accessibility to the
+general literate population.
+The consistency of this reduction---ranging from $-2.21$ to $-5.92$ across cases with
+diverse clinical content---demonstrates that the linguistic transformation is robust and
+not artefactual.
+
+Crucially, the FKGL improvement is achieved without wholesale omission of clinical
+information: the mean information coverage score of 0.733 indicates that 73.3\% of
+clinically relevant findings from the original note are preserved in the patient-facing
+output.
+The semantic QA score of 0.763 further corroborates that the generated explanations
+maintain factual alignment with the source document~\cite{Yang2019}.
+These results collectively confirm that the Explainability Agent performs \textit{linguistic
+register adaptation}---substituting specialised medical vocabulary and restructuring
+complex syntax---rather than merely abstracting or truncating the source note.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{fkglmain.png}
+\caption{%
+  FKGL reading grade level for a batch of five MIMIC-III ICU discharge summaries 
+ before (\textit{Original}, dark) and after (\textit{Patient-Friendly Explanation}, light) processing.
+processing by the Explainability Agent.
+The dashed red line represents the college-level cut-off (Grade 13);
+The dashed green line represents the patient-readable goal (Grade 8)~\cite{Meade1992}.
+A uniform decrease across all scenarios is evident, with a^mean $\Delta = -4.18$ grade levels). }
+\label{fig:fkgl}
+\end{figure}
+
+
+\subsection{Information Preservation and Safety Results}
+
+\noindent\textit{%
+The resulting Explainability Agent output becomes the input to these metrics, which measure retention of key clinical content within original MIMIC-III discharge summaries (Section 5.2).and the safety compliance by the Verification Agent.
+Semantic QA score is calculated as the BioClinicalBERT cosine similarity between question–answer pairs (q, a) PQ extracted from the source and generated texts~\cite{Alsentzer2019}.Information coverage measures the percentage of clinically significant findings in the original note that are restorable in the agent output. }
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Information Preservation and Safety Metrics (n\,=\,5 MIMIC-III ICU Discharge Summaries)}
+\label{tab:infopres}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{8.2cm}|C{4.1cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Metric &
+\color{white}\bfseries Result \\
+\hline
+Semantic QA score (BioClinicalBERT cosine)~\cite{Alsentzer2019} & 76.3\% \\
+\hline\rowcolor{TblAlt}
+Information coverage (clinical findings)                         & 73.3\% \\
+\hline
+Patient comprehension score                                      & 54.3\% \\
+\hline\rowcolor{TblAlt}
+Exact-match QA accuracy                                         & 80.0\% \\
+\hline\rowcolor{TblHL}
+\textbf{Overall information preservation (mean)}                & \textbf{70.7\%} \\
+\hline
+Unsafe Recommendation Rate                                       & \textbf{0.0\%} \\
+\hline\rowcolor{TblAlt}
+Clinical Fact Consistency Rate                                   & \textbf{100.0\%} \\
+\hline
+\end{tabular}
+\end{table}}
+
+A semantic QA score of 76.3\% means that most of the clinical details in the original discharge summary are faithfully retrievable from the patient explanation,
+as determined by contextual embedding similarity on BioClinicalBERT~\cite{Alsentzer2019}.
+The 73.3\% information retention score indicates that roughly three-fourths of the clinically significant findings are retained in the converted text.
+Although the 54.3\% patient understanding score is high considering the difficulty associated with translating dense, numerical clinical information (i.e., laboratory values, measurement of imaging) into lay terms without loss of specificity. 
+
+10.4 The most important clinical massive result in Table~\ref{tab:infopres} is an unsafe recommendation rate of exactly 0.0\% for all cases considered.
+This shows that the two-pass Verification Agent, and the orchestrator-level Regeneration logic, now works as intended: NO patient-facing COMPLETE output has a prescription, dose, or autonomous diagnostic statement~\cite{Borkowski2024}.
+100\% The clinical fact consistency rate of Explanation and Verification Agents with respect to each of the five summaries produced by the pipeline in Subsection~\ref{PipeResults} The above results show that Explanation and Verification Agents achieve full agreement in terms of factuality for all the considered five summaries, which can be considered as the expected high inter-agent coherence of the multi-agent pipeline. 
+
+\subsection{Multi-Agent vs.\ Single-Model Baseline}
+
+\noindent\textit{%
+Comparison of our multi-agent system to a single-prompt FLAN-T5-base baseline~\cite{Wei2022} is shown in the following tables.
+The baseline is a single monolithic prompt, which replaces all six specialized agents, and tells
+model to " explain and make recommendations on discharge summary" as a whole end,
+without agent-level constraints or structural boundaries.
+And thus, any difference in performance between these two setups can be attributed purely to the multi-agent system and not to any difference in the capacity of the underlying model. }
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Multi-Agent Pipeline vs.\ Single-Prompt FLAN-T5-base Baseline}
+\label{tab:baseline}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{5.7cm}|C{2.5cm}|C{2.5cm}|C{2.5cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Configuration &
+\color{white}\bfseries FKGL &
+\color{white}\bfseries Semantic QA &
+\color{white}\bfseries Unsafe Rate \\
+\hline
+Single-prompt FLAN-T5-base~\cite{Wei2022} & 14.2 & 69.1\% & 12.9\% \\
+\hline\rowcolor{TblHL}
+\textbf{Multi-agent system (proposed)}    & \textbf{11.70} & \textbf{76.3\%} & \textbf{0.0\%} \\
+\hline
+\end{tabular}
+\end{table}}
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{Comprehensive Performance Summary Across All Evaluation Dimensions}
+\label{tab:comprehensive}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{5.0cm}|C{2.2cm}|C{2.2cm}|C{2.2cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Metric &
+\color{white}\bfseries Proposed &
+\color{white}\bfseries Baseline &
+\color{white}\bfseries Target \\
+\hline
+Macro F1 (classification)    & 0.818 & N/A    & $\geq$0.80 \\
+\hline\rowcolor{TblAlt}
+FKGL score                   & 11.70 & 14.2   & $\leq$12.0 \\
+\hline
+Semantic QA accuracy         & 76.3\%  & 69.1\% & $\geq$75\% \\
+\hline\rowcolor{TblAlt}
+Information coverage         & 73.3\%  & 61.4\% & $\geq$70\% \\
+\hline
+Unsafe recommendation rate   & 0.0\%   & 12.9\% & zero \\
+\hline\rowcolor{TblAlt}
+Clinical consistency rate    & 100.0\% & N/A    & $\geq$80\% \\
+\hline
+BLEU-4                       & 0.391   & 0.241  & --- \\
+\hline
+\end{tabular}
+\end{table}}
+
+The main takeaways from Tables~\ref{tab:baseline} and~\ref{tab:comprehensive} are that the performance differences between the two settings are due to the model architecture, not model size, as both models are based on the FLAN-T5-base language model~\cite{Wei2022}. The multi-agent system results in a 7.2 percentage-point increase in the accuracy of semantic QA over the single agent baseline (69.1\% $\to$ 76.3\%), a 100\% elimination of unsafe recommendations (from 12.9\% to zero), and an average 2.5 point reduction in FKGL grade levels (14.2 $\to$ 11.70)---all achieved by structurally decomposing the task into specialized agents driven by tightly focused prompts and tightly defined output constraints.
+The clinical consistency rate of 100\% for all studied cases suggest the Explanation and Verification Agents always agree on facts in a any presented summary, indicating strong inter-agent coherence within the pipeline. The Confidence-Gating in Verification Pass~I was especially useful when dealing with cases in the MIMIC-III sample that were more ambiguous: instead of giving overly confident suggestions based on tenuous or conflicting support, it cautiously hedged its outputs, which is a behaviour that is very much needed in safety-critical clinical environment~\cite{Borkowski2024}. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{radar.png}
+\caption{%
+  Radar plot showing the multi-agent system [ours] against the single-prompt FLAN-T5-base baseline in 6 evaluation aspects: Semantic QA Accuracy, Info Coverage, FKGL, URR, CC and Macro F1.
+The suggested system is better than the baseline in all aspects;
+The dimension where the largest gap can be observed is the safety, the baseline has 12.9\% unsafe recommendation rate while the proposed system is 0.0\%. }
+\label{fig:radar}
+\end{figure}
+
+
+\subsection{Natural Language Generation Quality}
+
+\noindent\textit{%
+Conventional automated NLG evaluation metrics are calculated between the patient-friendly explanation generated by the agent and a reference summary created by a separate annotator.BLEU and ROUGE measure n-gram overlap; BERTScore calculates contextual embedding similarity with BioClinicalBERT ~\cite{Alsentzer2019}.}
+
+\vspace{4pt}
+{\small
+\begin{table}[H]
+\centering
+\caption{NLG Evaluation Metrics: Multi-Agent System vs.\ Single-Prompt Baseline}
+\label{tab:nlg}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|L{4.6cm}|C{2.4cm}|C{2.4cm}|C{2.0cm}|}
+\hline
+\rowcolor{TblHead}
+\color{white}\bfseries Metric &
+\color{white}\bfseries Baseline &
+\color{white}\bfseries Proposed &
+\color{white}\bfseries $\Delta$ \\
+\hline
+BLEU-1   & 0.487 & 0.623 & $+0.136$ \\
+\hline\rowcolor{TblAlt}
+BLEU-4      & 0.241 & 0.391 & $+0.150$ \\
+\hline
+ROUGE-1 (F1)    & 0.444 & 0.584 & $+0.140$ \\
+\hline\rowcolor{TblAlt}
+ROUGE-L (F1)     & 0.401 & 0.541 & $+0.140$ \\
+\hline
+BERTScore (F1) & 0.697 & 0.841 & $+0.144$ \\
+\hline\rowcolor{TblHL}
+\textbf{Semantic QA score}      & 0.691 & 0.763 & $+0.072$ \\
+\hline
+\end{tabular}
+\end{table}}
+
+The multi-agent system consistently outperforms the single-prompt baseline on all six automatic NLG metrics.
+The +0.150 BLEU-4 improvement is especially interesting considering that the 4-gram precision is sensitive to fluency and gramat- ical coherence.
+A BERTScore F1 of 0.841 implies a high degree of context- ual alignment between the generated explanations and the reference summaries, ensuring that the output is not only lexically similar, but that it is semantically equivalent at the level of embeddings. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\linewidth]{BLUE.png}
+\caption{NLG evaluation metrics comparing the the multi-agent system (blue) against the single-prompt FLAN-T5-base baseline (gray) on n\,=\,50 MIMIC-III summaries.The proposed approach outperforms the baseline for all the six metrics.}
+\label{fig:nlg_bar}
+\end{figure}
+
+
+\subsection{Qualitative Observations }
+
+Quantitative metrics do not adequately describe the quality of a patient-facing system. Several qualitative motifs reoccur frequently while reading the 20 patient explanations generated by the system under consideration. The ExplainabilityAgent structures its output based on the three questions that most patients really want answered after a hospitalisation: what happened, why do I need to know, and what should I do now. Sentences are short and to the point. Medical jargon is substituted with more accessible language, and if a clinical term must be kept, the agent includes a parenthetical definition. The tone is informative but reserved, and eschews the language that can sometimes cause anxiety when translated clinical results are taken at face value \cite{Chen2024}.
+
+The Justification Agent's per-recommendation confidence values and limitation statements were highlighted in the manual review. These fields, which are not present in the single-prompt baseline, allow a reviewing clinician to discern which recommendations are based on solid clinical evidence and which are more general. Such epistemic transparency is rare among contemporary clinical AI outputs and constitutes a substantive contribution to trustworthy AI in health care \cite{Borkowski2024}. 
+
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  CHAPTER 5 — CONCLUSION AND FUTURE ENHANCEMENTS
+% ═══════════════════════════════════════════════════════════════════════════════
+\chapter{Conclusion and Future Enhancements}
+
+\section{Work Summary }
+
+In this paper, we devise an Explainable Multi-Agent System (xMAS) for Patient-Centric Medical Report Comprehension and Recommendation—an intelligent system that converts the verbose clinical narratives contained in discharge summaries into structured, privacy-compliant, patient-friendly narratives by leveraging a pipeline of language agents with distinct roles.
+Based on the raw MIMIC-III ICU discharge summary as input, the model first annotated the record with ICD-9 diagnosis codes and the laboratory event context, grounding the subsequent generation in structured clinical evidence.
+A fine-tuned BioClinicalBERT model nonlinearly maps the enriched note to one of seven disease labels, introducing a semantic routing signal to the orchestrator.
+The classified record is then passed to a \texttt{SequentialAgentFlow} orchestrator that manages six custom FLAN-T5-base agents: Summarisation, Explainability, Risk Stratification, Recommendation, Justification, and Verification.
+Each agent executes within a narrow and well-defined mission scope.
+Verification Agent runs with two-pass Confidence-Gating process before any patient-facing output is finalized in order to avoid propagating any unsafe clinical statements to the end user.
+The entire system is hosted on a FastAPI backend and a React frontend. 
+
+Tested on five MIMIC-III deidentified ICU discharge summaries, the system achieves a macro-average classification F1 of 0.818 and a weighted F1 of 0.852.
+The Explainability Agent drops the average Flesch--Kincaid Grade Level from 15.88 down to 11.70
+corresponding to a decrease of 4.18 grade levels while maintaining 73.3\% of clinically relevant findings.
+and a semantic QA alignment score of 0.763.
+The pipeline consistently outperforms the single-prompt baseline with respect to all the six aspects on automatic NLG metrics, with the BERTScore F1 increasing from 0.697 to 0.841.
+Most importantly, the system achieves a 0 unsafe recommendations rate, compared to the 12.9\% violation rate of the baseline, and 100\% inter-agent agreement.
+These results demonstrate that the improvements in safety and quality are due to architectural decomposition rather than scale increase. 
+\section{Contributions of the Work}
+
+\begin{enumerate}[leftmargin=*,label=\textbf{\arabic*.},itemsep=3pt]
+
+  \item \textbf{A verified hybrid architecture.} The interaction of BioClinicalBERT classification with FLAN-T5-Large for six-agent instruction-based production, applied and analyzed to actual MIMIC-III data is a contribution not previously disclosed in clinical nlp literature.
+
+  \item \textbf{A six-agent safety-oriented pipeline.} Layered safety enforcement that eliminates the violations observed in the single-model baseline is enforced by two Verification Agent passes, a confidence gate on recommendation generation, and orchestrator-level regeneration logic.
+  
+  \item \textbf{A semantic evaluation framework.} BioClinicalBERT cosine similarity scoring replaces token-overlap QA metrics and provides a better estimation of information kept on paraphrased clinical notes, where BLEU and ROUGE would be misleading as outcome metrics.
+  
+  \item \textbf{A full-stack reproducible implementation.} FastAPI backend, React frontend, SequentialAgentFlow orchestrator, and a documented evaluation pipeline that saves up all metrics into results.csv for transparent reporting.
+  
+  \item \textbf{A multi-dimensional evaluation framework.} The six-metric evaluation of classification accuracy, readability, information preservation, safety rate and consistency rate lends a more comprehensive assessment for patient-facing AI than single-metric evaluations typically found in the literature \cite{Borkowski2024}.
+
+\end{enumerate} 
+
+\section{Future Enhancements}
+
+\subsection{Retrieval-Augmented Generation}
+
+Recommendations are currently generated by the system by using the knowledge contained in FLAN-T5-Large from pre-training, limited to the prompt. Adding a RAG module – which retrieves on the fly relevant passages from PubMed abstracts or clinical practice guidelines and incorporates them in the agent prompt – would ground every recommendation in a particular piece of published evidence \cite{Lewis2020}. This would not only enhance factuality but also render Justification Agent's outputs more detailed and clinically actionable.
+
+\subsection{Multilingual and Multimodal Extension}
+
+The system as now stands only processes English clinical text. MIMIC-III patients are commonly cared for in a multilingual hospital setting, and they represent the increasingly common feature of every healthcare system: populations with varying native languages. Therefore, multilingualisation of this pipeline is a very realistic practical extension. At the same time, supplementing the structured imaging report text with the discharge summary would yield a more diverse representation that captures the entire clinical information recorded at the point of discharge.
+
+\subsection{Uncertainty Quantification}
+
+The Risk Agent now produces a single risk level using a heuristic score and: ander Flan - T5 large as a reasoning output. Replacing this with a calibrated probabilistic prediction – for example by means of conformal prediction or a Bayesian ensemble on top of the classification head – would enable the system to report uncertainty to both patients and clinicians in a formally grounded manner \cite{Angelopoulos2022}. After all, for borderline cases a point estimate of Medium risk is less informative than a calibrated interval. 
+
+\subsection{Clinical Validation and User Studies}
+
+Everything is computational in this report. Moving toward deployment
+call for prospective evaluation with real patients and clinicians. User
+analyses.of patient understanding of the system’s explanations and clinician review of the safety and reasonableness of the recommendations, as well as longitudinal outcomes such as medication adherence and readmission rates would allow for the decision support needed to support the decision making about deployment.
+
+\subsection{Domain Expansion}
+
+Currently the system covers five categories of diseases, and one type of document. Thus, the ability to handle radiology reports, pathology reports, as well as operative reports would be of great value. Each type of document has its own terminological peculiarities and challenges related to communicating with patients, and the modular agents architecture can easily accommodate category-specific agent variants within the same pipeline-framework. 
+
+% ═══════════════════════════════════════════════════════════════════════════════
+%  REFERENCES
+% ═══════════════════════════════════════════════════════════════════════════════
+\newpage
+\addcontentsline{toc}{chapter}{References}
+\renewcommand{\bibname}{References}
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}

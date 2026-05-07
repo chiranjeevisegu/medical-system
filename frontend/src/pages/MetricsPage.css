@@ -189,6 +189,14 @@
     color: var(--text-muted);
 }
 
+/* Per-class chart title */
+.pc-chart-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 28px 0 6px;
+}
+
 /* Charts */
 .charts-grid {
     display: grid;
@@ -238,6 +246,17 @@
     line-height: 1.6;
     margin-bottom: 20px;
 }
+
+/* FKGL reference line legend tags */
+.fkgl-ref-lines {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    font-size: 0.78rem;
+}
+.fkgl-ref--college { color: #dc2626; font-weight: 600; }
+.fkgl-ref--patient { color: #16a34a; font-weight: 600; }
 
 /* Ablation */
 .ablation-card {

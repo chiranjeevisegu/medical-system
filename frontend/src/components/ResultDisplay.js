@@ -2,7 +2,7 @@ import React from 'react';
 import './ResultDisplay.css';
 
 const RISK_COLORS = { High: 'danger', Medium: 'warning', Low: 'success' };
-const RISK_ICONS = { High: '🔴', Medium: '🟡', Low: '🟢' };
+const RISK_ICONS = { High: 'High', Medium: 'Medium', Low: 'Low' };
 
 function ConfidenceBar({ value }) {
     const pct = Math.round(value * 100);
@@ -53,7 +53,7 @@ export default function ResultDisplay({ result, error, loading }) {
     if (error) {
         return (
             <div className="result-error section-card fade-in">
-                <h2>⚠️ Analysis Failed</h2>
+                <h2>Analysis Failed</h2>
                 <p className="error-msg">{error}</p>
                 <p className="error-hint">Make sure the backend is running: <code>uvicorn backend.api:app --reload</code></p>
             </div>
@@ -64,7 +64,7 @@ export default function ResultDisplay({ result, error, loading }) {
 
     const { disease_category, disease_confidence, risk, explanation, recommendation, justification, verification, processing_time_seconds } = result;
     const riskColor = RISK_COLORS[risk?.risk_level] || 'info';
-    const riskIcon = RISK_ICONS[risk?.risk_level] || '⚪';
+    const riskIcon = RISK_ICONS[risk?.risk_level] || 'Unknown';
 
     return (
         <div className="results-wrapper fade-in">
@@ -92,7 +92,7 @@ export default function ResultDisplay({ result, error, loading }) {
 
             {/* Patient Explanation */}
             <div className="section-card">
-                <h2>💬 Patient Explanation</h2>
+                <h2>Patient Explanation</h2>
                 <p className="explanation-text">{explanation?.simple_explanation}</p>
                 {explanation?.physiological_process && (
                     <div className="sub-section">
@@ -102,7 +102,7 @@ export default function ResultDisplay({ result, error, loading }) {
                 )}
                 {explanation?.plain_language_takeaway && (
                     <div className="takeaway-box">
-                        <span className="takeaway-icon">💡</span>
+                        <span className="takeaway-icon">→</span>
                         <p>{explanation.plain_language_takeaway}</p>
                     </div>
                 )}
@@ -110,7 +110,7 @@ export default function ResultDisplay({ result, error, loading }) {
 
             {/* Risk Details */}
             <div className="section-card">
-                <h2>⚠️ Risk Assessment</h2>
+                <h2>Risk Assessment</h2>
                 <p className="scope-note">{risk?.scope_note}</p>
                 <div className="risk-reasons">
                     {(risk?.reasons || []).map((r, i) => (
@@ -125,18 +125,18 @@ export default function ResultDisplay({ result, error, loading }) {
             {/* Recommendations */}
             <div className="result-grid">
                 <div className="section-card">
-                    <h2>✅ Safe Next Steps</h2>
+                    <h2>Safe Next Steps</h2>
                     <TagList items={recommendation?.safe_next_steps} variant="success" />
                 </div>
                 <div className="section-card">
-                    <h2>🚨 Urgent Warning Signs</h2>
+                    <h2>Urgent Warning Signs</h2>
                     <TagList items={recommendation?.urgent_attention_signs} variant="danger" />
                 </div>
             </div>
 
             {/* Justification */}
             <div className="section-card">
-                <h2>📝 Clinical Justification</h2>
+                <h2>Clinical Justification</h2>
                 <div className="just-conf">
                     <span>AI Confidence</span>
                     <ConfidenceBar value={justification?.confidence || 0} />
@@ -159,7 +159,7 @@ export default function ResultDisplay({ result, error, loading }) {
 
             {/* Verification */}
             <div className="section-card verification-card">
-                <h2>🔍 Verification</h2>
+                <h2>Verification</h2>
                 <div className="verif-score-row">
                     <span>Consistency Score</span>
                     <ConfidenceBar value={verification?.consistency_score || 0} />
@@ -183,7 +183,7 @@ export default function ResultDisplay({ result, error, loading }) {
 
             {/* Disclaimer */}
             <div className="disclaimer">
-                <span>⚕️</span>
+                <span>Note</span>
                 <p>This system provides <strong>informational support only</strong> and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek guidance from a qualified healthcare provider.</p>
             </div>
         </div>

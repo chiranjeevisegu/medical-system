@@ -2,10 +2,10 @@ import React from 'react';
 import './AboutPage.css';
 
 const TEAM_FEATURES = [
-    { icon: '🧬', title: 'Clinical NLP', desc: 'BioClinicalBERT fine-tuned on MIMIC-III discharge summaries for structured clinical fact extraction and 7-class disease classification.' },
-    { icon: '🤖', title: 'Multi-Agent Reasoning', desc: 'FLAN-T5 powers five specialized agents: Risk, Explainability, Recommendation, Justification, and Verification — each with strict safety constraints.' },
-    { icon: '🛡️', title: 'Safety-First Design', desc: 'Every recommendation is filtered through no-diagnose / no-prescribe rules. A dedicated verification agent checks cross-agent consistency.' },
-    { icon: '📊', title: 'Semantic Evaluation', desc: 'Beyond BLEU/ROUGE, the system measures cosine similarity with BioClinicalBERT embeddings (semantic QA score) and FKGL readability improvement.' },
+    { icon: '01', title: 'Clinical NLP', desc: 'BioClinicalBERT fine-tuned on MIMIC-III discharge summaries for structured clinical fact extraction and 7-class disease classification.' },
+    { icon: '02', title: 'Multi-Agent Reasoning', desc: 'FLAN-T5 powers five specialized agents: Risk, Explainability, Recommendation, Justification, and Verification — each with strict safety constraints.' },
+    { icon: '03', title: 'Safety-First Design', desc: 'Every recommendation is filtered through no-diagnose / no-prescribe rules. A dedicated verification agent checks cross-agent consistency.' },
+    { icon: '04', title: 'Semantic Evaluation', desc: 'Beyond BLEU/ROUGE, the system measures cosine similarity with BioClinicalBERT embeddings (semantic QA score) and FKGL readability improvement.' },
 ];
 
 const DATASET_INFO = [
@@ -44,7 +44,7 @@ export default function AboutPage() {
             <div className="section-card about-hero-card">
                 <div className="about-hero-inner">
                     <div className="about-text">
-                        <h2>🧠 Project Overview</h2>
+                        <h2>Project Overview</h2>
                         <p>
                             This system addresses a critical gap in healthcare: patients often receive dense,
                             jargon-heavy discharge summaries that they cannot understand. By combining
@@ -81,14 +81,14 @@ export default function AboutPage() {
 
             {/* Models */}
             <section className="section-card models-section">
-                <h2>🔬 Models Used</h2>
+                <h2>Models Used</h2>
                 <div className="models-grid">
                     {MODELS.map((m, i) => (
                         <div key={i} className="model-card" style={{ borderColor: `${m.color}30` }}>
                             <div className="model-header">
                                 <span className="model-name" style={{ color: m.color }}>{m.name}</span>
                                 <a href={`https://huggingface.co/${m.hf}`} target="_blank" rel="noreferrer" className="model-hf">
-                                    🤗 HuggingFace ↗
+                                    HuggingFace ↗
                                 </a>
                             </div>
                             <code className="model-id">{m.hf}</code>
@@ -101,7 +101,7 @@ export default function AboutPage() {
 
             {/* Dataset */}
             <section className="section-card dataset-section">
-                <h2>📁 Dataset — MIMIC-III</h2>
+                <h2>Dataset — MIMIC-III</h2>
                 <div className="dataset-table">
                     {DATASET_INFO.map((row, i) => (
                         <div key={i} className="dataset-row">
@@ -114,7 +114,7 @@ export default function AboutPage() {
 
             {/* Goal */}
             <div className="goal-card section-card">
-                <span className="goal-icon">🎯</span>
+                <span className="goal-icon">→</span>
                 <div>
                     <h3>Research Goal</h3>
                     <p>Make complex medical reports <strong>understandable for patients</strong> while maintaining clinical accuracy, safety constraints, and transparency through multi-agent explainability.</p>
@@ -123,7 +123,7 @@ export default function AboutPage() {
 
             {/* Pipeline reminder */}
             <div className="pipeline-mini section-card">
-                <h2>↔️ Quick Reference — Pipeline in 6 Steps</h2>
+                <h2>Quick Reference — Pipeline in 6 Steps</h2>
                 <div className="pipeline-mini-grid">
                     {['Clinical Extraction', 'Risk Assessment', 'Plain-Language Explanation',
                         'Safe Recommendations', 'Clinical Justification', 'Consistency Verification'

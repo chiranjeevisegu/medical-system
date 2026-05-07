@@ -1,0 +1,580 @@
+📊 1️⃣ Clinical Classification Metrics
+
+These evaluate the BioClinicalBERT classification layer.
+
+🔹 Precision
+What it means:
+
+Out of all predicted disease categories, how many were correct?
+
+𝑃
+𝑟
+𝑒
+𝑐
+𝑖
+𝑠
+𝑖
+𝑜
+𝑛
+=
+𝑇
+𝑟
+𝑢
+𝑒
+ 
+𝑃
+𝑜
+𝑠
+𝑖
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
+𝑇
+𝑟
+𝑢
+𝑒
+ 
+𝑃
+𝑜
+𝑠
+𝑖
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
++
+𝐹
+𝑎
+𝑙
+𝑠
+𝑒
+ 
+𝑃
+𝑜
+𝑠
+𝑖
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
+Precision=
+True Positives+False Positives
+True Positives
+	​
+
+Why it matters:
+
+If precision is low:
+
+The model predicts wrong categories often.
+
+Clinical grounding becomes unreliable.
+
+High precision → fewer false alarms.
+
+🔹 Recall
+What it means:
+
+Out of all actual disease categories, how many did we correctly detect?
+
+𝑅
+𝑒
+𝑐
+𝑎
+𝑙
+𝑙
+=
+𝑇
+𝑟
+𝑢
+𝑒
+ 
+𝑃
+𝑜
+𝑠
+𝑖
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
+𝑇
+𝑟
+𝑢
+𝑒
+ 
+𝑃
+𝑜
+𝑠
+𝑖
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
++
+𝐹
+𝑎
+𝑙
+𝑠
+𝑒
+ 
+𝑁
+𝑒
+𝑔
+𝑎
+𝑡
+𝑖
+𝑣
+𝑒
+𝑠
+Recall=
+True Positives+False Negatives
+True Positives
+	​
+
+Why it matters:
+
+If recall is low:
+
+The system misses true diseases.
+
+Risk assessment becomes incomplete.
+
+High recall → fewer missed conditions.
+
+🔹 F1 Score
+What it means:
+
+Balanced measure of Precision and Recall.
+
+𝐹
+1
+=
+2
+×
+𝑃
+𝑟
+𝑒
+𝑐
+𝑖
+𝑠
+𝑖
+𝑜
+𝑛
+×
+𝑅
+𝑒
+𝑐
+𝑎
+𝑙
+𝑙
+𝑃
+𝑟
+𝑒
+𝑐
+𝑖
+𝑠
+𝑖
+𝑜
+𝑛
++
+𝑅
+𝑒
+𝑐
+𝑎
+𝑙
+𝑙
+F1=2×
+Precision+Recall
+Precision×Recall
+	​
+
+Why it matters:
+
+In medical AI, both false positives and false negatives matter.
+F1 gives a balanced clinical performance score.
+
+📖 2️⃣ Readability Metrics
+
+These evaluate how understandable the explanation is.
+
+🔹 FKGL (Flesch-Kincaid Grade Level)
+What it measures:
+
+Reading grade level required to understand text.
+
+Example:
+
+FKGL = 14 → college level
+
+FKGL = 8 → 8th grade level
+
+Why it matters:
+
+Medical reports are usually very complex (high FKGL).
+Our goal is to reduce it for patient understanding.
+
+FKGL Improvement:
+𝐼
+𝑚
+𝑝
+𝑟
+𝑜
+𝑣
+𝑒
+𝑚
+𝑒
+𝑛
+𝑡
+=
+𝑂
+𝑟
+𝑖
+𝑔
+𝑖
+𝑛
+𝑎
+𝑙
+ 
+𝐹
+𝐾
+𝐺
+𝐿
+−
+𝐴
+𝑔
+𝑒
+𝑛
+𝑡
+ 
+𝐹
+𝐾
+𝐺
+𝐿
+Improvement=Original FKGL−Agent FKGL
+
+Higher improvement = better readability.
+
+✂️ 3️⃣ Length Reduction
+What it measures:
+
+How much shorter the explanation is compared to original.
+
+𝑅
+𝑒
+𝑑
+𝑢
+𝑐
+𝑡
+𝑖
+𝑜
+𝑛
+%
+=
+𝑂
+𝑟
+𝑖
+𝑔
+𝑖
+𝑛
+𝑎
+𝑙
+ 
+𝑊
+𝑜
+𝑟
+𝑑
+𝑠
+−
+𝐴
+𝑔
+𝑒
+𝑛
+𝑡
+ 
+𝑊
+𝑜
+𝑟
+𝑑
+𝑠
+𝑂
+𝑟
+𝑖
+𝑔
+𝑖
+𝑛
+𝑎
+𝑙
+ 
+𝑊
+𝑜
+𝑟
+𝑑
+𝑠
+Reduction%=
+Original Words
+Original Words−Agent Words
+	​
+
+Why it matters:
+
+Patients need concise summaries.
+
+But:
+Too much reduction → information loss.
+
+Ideal range:
+20–40%
+
+🧠 4️⃣ QA-Based Accuracy
+What it measures:
+
+Does the explanation preserve important medical facts?
+
+Process:
+
+Generate 3 factual questions from report.
+
+Check if explanation answers them.
+
+Compute accuracy.
+
+𝑄
+𝐴
+ 
+𝑆
+𝑐
+𝑜
+𝑟
+𝑒
+=
+𝐶
+𝑜
+𝑟
+𝑟
+𝑒
+𝑐
+𝑡
+ 
+𝐴
+𝑛
+𝑠
+𝑤
+𝑒
+𝑟
+𝑠
+𝑇
+𝑜
+𝑡
+𝑎
+𝑙
+ 
+𝑄
+𝑢
+𝑒
+𝑠
+𝑡
+𝑖
+𝑜
+𝑛
+𝑠
+QA Score=
+Total Questions
+Correct Answers
+	​
+
+Why it matters:
+
+This measures information preservation, not fluency.
+
+If QA = 0 → explanation lost important details.
+
+📌 5️⃣ Information Coverage
+What it measures:
+
+How many major diagnoses are mentioned in explanation.
+
+𝐶
+𝑜
+𝑣
+𝑒
+𝑟
+𝑎
+𝑔
+𝑒
+=
+𝐷
+𝑖
+𝑎
+𝑔
+𝑛
+𝑜
+𝑠
+𝑒
+𝑠
+ 
+𝑀
+𝑒
+𝑛
+𝑡
+𝑖
+𝑜
+𝑛
+𝑒
+𝑑
+𝑇
+𝑜
+𝑡
+𝑎
+𝑙
+ 
+𝐷
+𝑖
+𝑎
+𝑔
+𝑛
+𝑜
+𝑠
+𝑒
+𝑠
+Coverage=
+Total Diagnoses
+Diagnoses Mentioned
+	​
+
+Why it matters:
+
+Prevents oversimplification.
+
+High readability with low coverage = dangerous simplification.
+
+🛡️ 6️⃣ Unsafe Recommendation Rate
+What it measures:
+
+Percentage of outputs that contain:
+
+Prescriptions
+
+Dosage advice
+
+Direct medical diagnosis
+
+𝑈
+𝑛
+𝑠
+𝑎
+𝑓
+𝑒
+ 
+𝑅
+𝑎
+𝑡
+𝑒
+=
+𝑈
+𝑛
+𝑠
+𝑎
+𝑓
+𝑒
+ 
+𝑂
+𝑢
+𝑡
+𝑝
+𝑢
+𝑡
+𝑠
+𝑇
+𝑜
+𝑡
+𝑎
+𝑙
+ 
+𝑂
+𝑢
+𝑡
+𝑝
+𝑢
+𝑡
+𝑠
+Unsafe Rate=
+Total Outputs
+Unsafe Outputs
+	​
+
+Why it matters:
+
+In healthcare AI, safety is critical.
+
+Target: 0%
+
+🔄 7️⃣ Consistency Rate
+What it measures:
+
+Internal logical consistency of multi-agent outputs.
+
+Checks:
+
+No contradictions
+
+No conflicting risk levels
+
+No missing justifications
+
+𝐶
+𝑜
+𝑛
+𝑠
+𝑖
+𝑠
+𝑡
+𝑒
+𝑛
+𝑐
+𝑦
+=
+1
+−
+𝐶
+𝑜
+𝑛
+𝑡
+𝑟
+𝑎
+𝑑
+𝑖
+𝑐
+𝑡
+𝑖
+𝑜
+𝑛
+ 
+𝑅
+𝑎
+𝑡
+𝑒
+Consistency=1−Contradiction Rate
+Why it matters:
+
+Multi-agent systems can disagree.
+Consistency ensures structured reliability.
+
+📈 8️⃣ Trust Calibration
+What it measures:
+
+Alignment between confidence score and correctness.
+
+If:
+
+Model confidence = 0.9
+
+But wrong → bad calibration.
+
+Good calibration means:
+Confidence reflects actual reliability.

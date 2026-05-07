@@ -1,0 +1,75 @@
+ust
+
+Language/Stack Proficiency
+Python
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Can write clean, structured, well tested code
+Understands performance, concurrency, architecture
+Python internals / language design impacts
+Go
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Can write clean, structured, well tested code
+Understands performance, concurrency, architecture
+Go internals / language design impacts
+Javascript
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Can write clean, structured, well tested code
+Understands performance, concurrency, architecture
+Javascript internals / language design impacts
+Typescript
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Can write clean, structured, well tested code
+Understands performance, concurrency, architecture
+Typescript internals / language design impacts
+React
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Component-based apps, state management
+Performance, hooks patterns, design trade-offs
+Architecture decisions, complex UI systems
+Kubernetes
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness
+Guided Usage
+Experience with configs, Helm charts, and basic cluster operations
+Experience with monitoring, scaling, failures, and reliability concerns
+Strong understanding of observability, architecture, resilience, and production trade-offs
+Linux / Networking
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness and networking concepts
+Guided Usage
+Operational understanding and debugging of Linux machines in cloud platforms/networks
+Understands system behavior and network architecture; can reason about performance and security trade-offs
+Hands-on production debugging; strong infrastructure and reliability understanding
+Product Security proficiency (AppSec, testing, and bug hunting)
+*
+Please rate your proficiency 
+No Exposure
+Basic Awareness (OWASP, common tools, basic concept knowledge)
+Guided Usage (uses scanners, follows playbooks, bug bounty participation)
+Can work independently (manual testing, tool-driven testing, valid bug reports)
+Deep understanding (advanced testing, exploitation paths, threat assesments)
+Advanced security proficiency, including threat modeling, attack analysis, and risk assessment.

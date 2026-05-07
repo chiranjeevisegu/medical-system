@@ -6,76 +6,62 @@ This document describes the high-level architecture of the Explainable Multi-Age
 
 ```mermaid
 graph TD
-
-    %% ================================
     %% Users and API Layer
-    %% ================================
-    User((User / Dashboard)) <--> |HTTP GET / POST| FastAPI[FastAPI App<br/>main.py]
+    User((User / Dashboard)) <--> |HTTP GET / POST| FastAPI[FastAPI App / main.py]
 
-    %% ================================
-    %% Data Layer
-    %% ================================
-    subgraph Data_Layer
+    %% Data Sources
+    subgraph Data Layer
         CSV_NOTEEVENTS[(NOTEEVENTS.csv)]
         CSV_DIAGNOSES[(DIAGNOSES_ICD.csv)]
         CSV_LABEVENTS[(LABEVENTS.csv)]
     end
 
+    %% Data Loading
     CSV_NOTEEVENTS --> DataLoader[MIMICDatasetLoader]
     CSV_DIAGNOSES --> DataLoader
     CSV_LABEVENTS --> DataLoader
-
+    
     DataLoader --> EnrichedReport[Enriched Report State]
-
-    %% ================================
-    %% Local LLM Ecosystem
-    %% ================================
-    subgraph Local_LLM_Ecosystem
+    
+    %% Model Manager
+    subgraph Local LLM Ecosystem
         FlanT5{{google/flan-t5-large}}
         BioGPT{{microsoft/biogpt}}
         BioClinicalBERT{{BioClinicalBERT Classifier}}
     end
 
-    %% ================================
-    %% Orchestrator & Agent Flow
-    %% ================================
+    %% Orchestrator & Agents
     FastAPI --> Orchestrator[Orchestrator]
     Orchestrator --> Flow[SequentialAgentFlow]
-
     EnrichedReport -.-> Flow
     FlanT5 -.-> Flow
     BioGPT -.-> Flow
     BioClinicalBERT -.-> Flow
-
-    %% ================================
-    %% Multi-Agent Pipeline
-    %% ================================
-    subgraph Multi_Agent_Pipeline
+    
+    subgraph Multi-Agent Pipeline
         direction TB
-        A1[ClinicalAgent] -->|clinical_summary| A2[RiskAgent]
-        A2 -->|risk| A3[ExplainabilityAgent]
-        A3 -->|explanation| A4[VerificationAgent<br/>Pre-Verification]
-        A4 -->|verification_preliminary<br/>confidence_gate| A5[RecommendationAgent]
-        A5 -->|recommendation| A6[JustificationAgent]
-        A6 -->|justification| A7[VerificationAgent<br/>Final Verification]
+        A1(ClinicalAgent) --> |clinical_summary| A2(RiskAgent)
+        A2 --> |risk| A3(ExplainabilityAgent)
+        A3 --> |explanation| A4(VerificationAgent<br/>Pre-Verification)
+        A4 --> |verification_preliminary<br/>confidence_gate| A5(RecommendationAgent)
+        A5 --> |recommendation| A6(JustificationAgent)
+        A6 --> |justification| A7(VerificationAgent<br/>Final Verification)
     end
-
-    Flow --> Multi_Agent_Pipeline
-    Multi_Agent_Pipeline --> FinalState[Final Validated State]
-
-    %% ================================
+    
+    Flow --> Multi-AgentPipeline
+    Multi-AgentPipeline --> FinalState[Final Validated State]
+    
     %% Evaluation
-    %% ================================
     subgraph Evaluation
         Eval[Evaluator]
         Baseline[BaselineSummarizer]
     end
-
-    FastAPI -->|/evaluate| Eval
+    
+    FastAPI --> |/evaluate| Eval
     Eval --> Baseline
     FinalState --> Eval
     Eval --> Results[(results.csv)]
-
+    
     FinalState --> FastAPI
 ```
 

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMAF Graphical Abstract</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #04091a;
+    --surface: #0a1628;
+    --card: #0e1d35;
+    --border: #1a3a5c;
+    --accent1: #00c6ff;
+    --accent2: #0a84e1;
+    --accent3: #38e8c6;
+    --accent4: #ff6b9d;
+    --accent5: #ffd166;
+    --accent6: #a78bfa;
+    --text: #e8f4ff;
+    --muted: #7a9cc4;
+    --glow: rgba(0,198,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Sora', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  /* starfield */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 30%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.15) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,0.18) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.12) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 45%, rgba(255,255,255,0.2) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .poster {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1200px;
+    background: linear-gradient(145deg, #060d1e 0%, #0a1628 50%, #060f20 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 0 80px rgba(0,198,255,0.08),
+      0 0 0 1px rgba(0,198,255,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  /* top glow bar */
+  .poster::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent2), var(--accent1), var(--accent3), transparent);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid rgba(26,58,92,0.5);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+  }
+
+  .journal-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent1);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.85;
+  }
+
+  .main-title {
+    font-size: clamp(18px, 2.4vw, 28px);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+    max-width: 680px;
+  }
+
+  .main-title span {
+    background: linear-gradient(90deg, var(--accent1), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .authors {
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  .badge-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-blue  { color: var(--accent1); border-color: rgba(0,198,255,0.3); background: rgba(0,198,255,0.05); }
+  .badge-teal  { color: var(--accent3); border-color: rgba(56,232,198,0.3); background: rgba(56,232,198,0.05); }
+  .badge-pink  { color: var(--accent4); border-color: rgba(255,107,157,0.3); background: rgba(255,107,157,0.05); }
+
+  /* ── MAIN CONTENT GRID ── */
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr 32px 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  /* vertical connector columns */
+  .connector-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .arrow-v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    height: 100%;
+    justify-content: center;
+  }
+
+  .arrow-line {
+    width: 2px;
+    flex: 1;
+    min-height: 60px;
+    background: linear-gradient(to bottom, var(--accent2), var(--accent1));
+    opacity: 0.5;
+  }
+
+  .arrow-head {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 9px solid var(--accent1);
+    opacity: 0.7;
+    margin-top: -1px;
+  }
+
+  /* ── COLUMNS ── */
+  .col {
+    padding: 36px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .col-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(26,58,92,0.6);
+    margin-bottom: 4px;
+  }
+
+  /* ── INPUT CARD ── */
+  .input-card {
+    background: linear-gradient(135deg, rgba(10,29,53,0.9), rgba(6,15,32,0.9));
+    border: 1px solid rgba(0,198,255,0.2);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0,198,255,0.04);
+  }
+
+  .input-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+  }
+
+  .card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .card-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .mono-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(0,198,255,0.5);
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  /* ── CLASSIFICATION BOX ── */
+  .classify-card {
+    background: linear-gradient(135deg, rgba(10,132,225,0.08), rgba(4,9,26,0.95));
+    border: 1px solid rgba(10,132,225,0.3);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+  }
+
+  .classify-card::after {
+    content: 'BioClinicalBERT';
+    position: absolute;
+    top: -1px; right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    background: var(--accent2);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 0 0 6px 6px;
+    font-weight: 600;
+  }
+
+  .embed-viz {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2px;
+    margin: 12px 0;
+  }
+
+  .embed-cell {
+    height: 6px;
+    border-radius: 1px;
+    animation: pulse-cell 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-cell {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .disease-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .dtag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── AGENTS ── */
+  .agent-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .agent {
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    align-items: start;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
+  }
+
+  .agent:hover {
+    transform: translateX(3px);
+    box-shadow: -3px 0 0 currentColor;
+  }
+
+  .agent-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid currentColor;
+    flex-shrink: 0;
+  }
+
+  .agent-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+  }
+
+  .agent-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .a1 { color: #60a5fa; border-color: rgba(96,165,250,0.2); background: rgba(96,165,250,0.04); }
+  .a2 { color: var(--accent3); border-color: rgba(56,232,198,0.2); background: rgba(56,232,198,0.04); }
+  .a3 { color: var(--accent5); border-color: rgba(255,209,102,0.2); background: rgba(255,209,102,0.04); }
+  .a4 { color: var(--accent6); border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.04); }
+  .a5 { color: var(--accent4); border-color: rgba(255,107,157,0.2); background: rgba(255,107,157,0.04); }
+
+  /* ── OUTPUT CARDS ── */
+  .output-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .out-card {
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid;
+    position: relative;
+  }
+
+  .out-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .out-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.45;
+    font-style: italic;
+  }
+
+  .o1 { border-color: rgba(96,165,250,0.25); background: rgba(96,165,250,0.04); }
+  .o1 .out-label { color: #60a5fa; }
+  .o2 { border-color: rgba(56,232,198,0.25); background: rgba(56,232,198,0.04); }
+  .o2 .out-label { color: var(--accent3); }
+  .o3 { border-color: rgba(255,209,102,0.25); background: rgba(255,209,102,0.04); }
+  .o3 .out-label { color: var(--accent5); }
+  .o4 { border-color: rgba(167,139,250,0.25); background: rgba(167,139,250,0.04); }
+  .o4 .out-label { color: var(--accent6); }
+
+  .verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--accent3);
+    border: 1px solid rgba(56,232,198,0.3);
+    background: rgba(56,232,198,0.06);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+
+  .verified-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent3);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── METRICS ROW ── */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(26,58,92,0.6);
+    background: rgba(6,13,26,0.8);
+  }
+
+  .metric {
+    padding: 22px 16px;
+    text-align: center;
+    border-right: 1px solid rgba(26,58,92,0.4);
+    position: relative;
+  }
+  .metric:last-child { border-right: none; }
+
+  .metric-val {
+    font-family: 'Sora', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-unit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .metric-name {
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ── FOOTER ── */
+  .footer-row {
+    padding: 20px 48px;
+    border-top: 1px solid rgba(26,58,92,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(4,9,26,0.5);
+  }
+
+  .footer-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .footer-pills {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(0,198,255,0.2);
+    color: var(--accent1);
+    background: rgba(0,198,255,0.04);
+  }
+
+  /* ── DIVIDER DECORATION ── */
+  .section-divider {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(26,58,92,0.8), transparent);
+    margin: 0 48px;
+  }
+
+  /* animations on load */
+  .col { opacity: 0; animation: fadeUp 0.6s ease forwards; }
+  .col:nth-child(1) { animation-delay: 0.1s; }
+  .col:nth-child(3) { animation-delay: 0.25s; }
+  .col:nth-child(5) { animation-delay: 0.4s; }
+
+  .agent { opacity: 0; animation: slideIn 0.4s ease forwards; }
+  .agent:nth-child(1) { animation-delay: 0.4s; }
+  .agent:nth-child(2) { animation-delay: 0.5s; }
+  .agent:nth-child(3) { animation-delay: 0.6s; }
+  .agent:nth-child(4) { animation-delay: 0.7s; }
+  .agent:nth-child(5) { animation-delay: 0.8s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .metrics-row .metric {
+    opacity: 0;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .metric:nth-child(1) { animation-delay: 0.8s; }
+  .metric:nth-child(2) { animation-delay: 0.9s; }
+  .metric:nth-child(3) { animation-delay: 1.0s; }
+  .metric:nth-child(4) { animation-delay: 1.1s; }
+  .metric:nth-child(5) { animation-delay: 1.2s; }
+
+  /* embed color bars */
+  .ec1 { background: #60a5fa; animation-delay: 0.0s; }
+  .ec2 { background: #34d399; animation-delay: 0.2s; }
+  .ec3 { background: #a78bfa; animation-delay: 0.4s; }
+  .ec4 { background: #fbbf24; animation-delay: 0.6s; }
+  .ec5 { background: #f87171; animation-delay: 0.8s; }
+  .ec6 { background: var(--accent1); animation-delay: 1.0s; }
+  .ec7 { background: #818cf8; animation-delay: 0.1s; }
+  .ec8 { background: #2dd4bf; animation-delay: 0.3s; }
+  .ec9 { background: #fb923c; animation-delay: 0.5s; }
+  .ec10{ background: var(--accent4); animation-delay: 0.7s; }
+  .ec11{ background: #a3e635; animation-delay: 0.9s; }
+  .ec12{ background: #e879f9; animation-delay: 0.0s; }
+</style>
+</head>
+<body>
+
+<div class="poster">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="journal-tag">&#x25C6; Graphical Abstract &nbsp;&bull;&nbsp; Clinical NLP &nbsp;&bull;&nbsp; 2025–26</div>
+      <h1 class="main-title">
+        An <span>Explainable Multi-Agent Framework</span> for<br>
+        Patient-Centric Medical Report Understanding
+      </h1>
+      <p class="authors">Ch. V. L. Vardhan &nbsp;·&nbsp; V. C. Segu &nbsp;·&nbsp; A. V. S. Harshendra &nbsp;·&nbsp; Mentor: Dr. Sathya Rajendra Singh .R</p>
+    </div>
+    <div class="badge-row">
+      <span class="badge badge-blue">MIMIC-III Dataset</span>
+      <span class="badge badge-teal">BioClinicalBERT</span>
+      <span class="badge badge-pink">FLAN-T5 Agents</span>
+    </div>
+  </div>
+
+  <!-- MAIN 3-COLUMN PIPELINE -->
+  <div class="content">
+
+    <!-- COL 1: INPUT -->
+    <div class="col">
+      <div class="col-title">&#x2460; &nbsp; Input Layer</div>
+
+      <div class="input-card">
+        <div class="card-icon" style="background:rgba(0,198,255,0.08);border:1px solid rgba(0,198,255,0.2);">📋</div>
+        <div class="card-label" style="color:var(--accent1);">Clinical Discharge Summary</div>
+        <div class="card-desc">De-identified free-text ICU notes from MIMIC-III spanning diagnoses, medications, and treatment histories.</div>
+        <div class="mono-text">
+          SOURCE: MIMIC-III / PhysioNet<br>
+          CASES: 20 real-world records<br>
+          FORMAT: Free-text narrative<br>
+          ACCESS: De-identified, public
+        </div>
+      </div>
+
+      <div class="input-card" style="border-color:rgba(56,232,198,0.15);">
+        <div class="card-icon" style="background:rgba(56,232,198,0.06);border:1px solid rgba(56,232,198,0.2);">🏷️</div>
+        <div class="card-label" style="color:var(--accent3);">ICD-9 Ground Truth Labels</div>
+        <div class="card-desc">Disease category labels derived from MIMIC-III diagnosis table for supervised classification evaluation.</div>
+        <div class="disease-tags">
+          <span class="dtag" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);">Cardiovascular</span>
+          <span class="dtag" style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2);">Respiratory</span>
+          <span class="dtag" style="background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);">Endocrine</span>
+          <span class="dtag" style="background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);">Infectious</span>
+          <span class="dtag" style="background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);">Neurological</span>
+        </div>
+      </div>
+
+      <div class="input-card" style="border-color:rgba(167,139,250,0.15);">
+        <div class="card-icon" style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);">🔬</div>
+        <div class="card-label" style="color:var(--accent6);">BioClinicalBERT Tokenization</div>
+        <div class="card-desc">WordPiece tokenizer processes summaries at max 512 tokens. CLS embedding (768-dim) extracted from the final transformer layer.</div>
+        <div class="embed-viz">
+          <div class="embed-cell ec1"></div><div class="embed-cell ec2"></div><div class="embed-cell ec3"></div>
+          <div class="embed-cell ec4"></div><div class="embed-cell ec5"></div><div class="embed-cell ec6"></div>
+          <div class="embed-cell ec7"></div><div class="embed-cell ec8"></div><div class="embed-cell ec9"></div>
+          <div class="embed-cell ec10"></div><div class="embed-cell ec11"></div><div class="embed-cell ec12"></div>
+        </div>
+        <div class="mono-text">768-dim CLS vector → Linear Head → Softmax</div>
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div class="connector-col">
+      <div class="arrow-v">
+        <div class="arrow-line"></div>
+        <div class="arrow-head"></div>
+      </div>
+    </div>
+
+    <!-- COL 2: AGENTS -->
+    <div class="col">
+      <div class="col-title">&#x2461; &nbsp; Multi-Agent Reasoning (FLAN-T5)</div>
+
+      <div class="classify-card">
+        <div class="card-label" style="color:var(--accent2);margin-bottom:6px;">Classification Layer</div>
+        <div class="card-desc">BioClinicalBERT + Linear Head maps unstructured discharge text to one of five structured disease signals. Supervised with AdamW (lr=2e⁻⁵), evaluated by Precision / Recall / F1.</div>
+      </div>
+
+      <div class="agent-stack">
+
+        <div class="agent a1">
+          <div class="agent-num" style="color:#60a5fa;">01</div>
+          <div>
+            <div class="agent-name" style="color:#60a5fa;">Risk Agent</div>
+            <div class="agent-desc">Assigns Low / Medium / High risk with structured clinical rationale grounded in report indicators.</div>
+          </div>
+        </div>
+
+        <div class="agent a2">
+          <div class="agent-num" style="color:var(--accent3);">02</div>
+          <div>
+            <div class="agent-name" style="color:var(--accent3);">Explainability Agent</div>
+            <div class="agent-desc">Translates clinical findings into FKGL ≤8 patient-friendly language using analogies and plain vocabulary.</div>
+          </div>
+        </div>
+
+        <div class="agent a3">
+          <div class="agent-num" style="color:var(--accent5);">03</div>
+          <div>
+            <div class="agent-name" style="color:var(--accent5);">Recommendation Agent</div>
+            <div class="agent-desc">Generates 3–5 safe, non-diagnostic next steps emphasising follow-up care and symptom monitoring.</div>
+          </div>
+        </div>
+
+        <div class="agent a4">
+          <div class="agent-num" style="color:var(--accent6);">04</div>
+          <div>
+            <div class="agent-name" style="color:var(--accent6);">Justification Agent</div>
+            <div class="agent-desc">Explains recommendation rationale, confidence level, and explicit limitations for interpretability.</div>
+          </div>
+        </div>
+
+        <div class="agent a5">
+          <div class="agent-num" style="color:var(--accent4);">05</div>
+          <div>
+            <div class="agent-name" style="color:var(--accent4);">Verification Agent</div>
+            <div class="agent-desc">Detects contradictions and unsafe language across all agent outputs. Triggers re-generation if flagged.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 2 -->
+    <div class="connector-col">
+      <div class="arrow-v">
+        <div class="arrow-line" style="background:linear-gradient(to bottom,var(--accent3),var(--accent1));"></div>
+        <div class="arrow-head" style="border-top-color:var(--accent3);"></div>
+      </div>
+    </div>
+
+    <!-- COL 3: OUTPUT -->
+    <div class="col">
+      <div class="col-title">&#x2462; &nbsp; Patient-Facing Output</div>
+
+      <div class="output-stack">
+        <div class="out-card o1">
+          <div class="out-label">Disease Category + Risk</div>
+          <div class="out-text">"Cardiovascular disorder — Heart Failure. Risk level: High. Elevated BNP and bilateral oedema detected."</div>
+        </div>
+
+        <div class="out-card o2">
+          <div class="out-label">Plain-Language Explanation</div>
+          <div class="out-text">"Your heart is having trouble pumping blood efficiently. This caused fluid to build up in your lungs and legs, making it hard to breathe."</div>
+        </div>
+
+        <div class="out-card o3">
+          <div class="out-label">Safe Recommendations</div>
+          <div class="out-text">"Consult your cardiologist within 7 days. Monitor for worsening shortness of breath or sudden weight gain (>2 kg overnight)."</div>
+        </div>
+
+        <div class="out-card o4">
+          <div class="out-label">Justification + Confidence</div>
+          <div class="out-text">"Recommendations based on documented BNP elevation (920 pg/mL) and bilateral crackles noted in clinical exam. Confidence: Medium."</div>
+        </div>
+
+        <div style="padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,107,157,0.25); background: rgba(255,107,157,0.04);">
+          <div class="out-label" style="color:var(--accent4);">Verification Status</div>
+          <div class="out-text">All agent outputs cross-checked for semantic contradictions and unsafe diagnostic claims.</div>
+          <div style="margin-top:8px;">
+            <span class="verified-badge"><span class="verified-dot"></span>VERIFIED — Safe for Patient Delivery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- METRICS ROW -->
+  <div class="metrics-row">
+    <div class="metric">
+      <div class="metric-val" style="background:linear-gradient(135deg,var(--accent1),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">F1</div>
+      <div class="metric-unit">Classification Score</div>
+      <div class="metric-name">Precision · Recall · F1</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:#60a5fa;">≤8</div>
+      <div class="metric-unit">FKGL Target</div>
+      <div class="metric-name">Readability Grade Level</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--accent3);">20</div>
+      <div class="metric-unit">MIMIC-III Cases</div>
+      <div class="metric-name">Real Clinical Records</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--accent5);">5</div>
+      <div class="metric-unit">Autonomous Agents</div>
+      <div class="metric-name">Specialized Reasoning</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" style="color:var(--accent6);">768</div>
+      <div class="metric-unit">CLS Dimensions</div>
+      <div class="metric-name">BioClinicalBERT Embed</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-row">
+    <div class="footer-left">AMRITA VISHWA VIDYAPEETHAM &nbsp;·&nbsp; DEPT. OF ARTIFICIAL INTELLIGENCE &nbsp;·&nbsp; BATCH A13 &nbsp;·&nbsp; 2025–26</div>
+    <div class="footer-pills">
+      <span class="pill">Clinical NLP</span>
+      <span class="pill">Explainable AI</span>
+      <span class="pill">Multi-Agent Systems</span>
+      <span class="pill">Patient Safety</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
