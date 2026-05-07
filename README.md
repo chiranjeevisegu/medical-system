@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="Essentials/Architecture.png" alt="Medical Agentic System Architecture" width="100%">
   
   # 🏥 MedAI: Explainable Multi-Agent Framework for Patient-Centric Medical Report Comprehension
   
@@ -30,6 +29,47 @@ Clinical Natural Language Processing (NLP) has traditionally struggled to bridge
 ## 🏗️ System Architecture
 
 The system operates on a **Hybrid Clinical–Reasoning Multi-Agent Architecture** separating domain grounding from patient-centric reasoning.
+
+```mermaid
+graph TD
+    classDef database fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px;
+    classDef model fill:#e0f2fe,stroke:#38bdf8,stroke-width:2px;
+    classDef agent fill:#f0fdf4,stroke:#4ade80,stroke-width:2px;
+    classDef core fill:#fef3c7,stroke:#fbbf24,stroke-width:2px;
+    classDef ui fill:#faf5ff,stroke:#c084fc,stroke-width:2px;
+
+    %% Data Layer
+    db[(MIMIC-III Database<br/>NOTEEVENTS, DIAGNOSES_ICD, LABEVENTS)]:::database
+
+    %% Clinical Representation Layer
+    subgraph Clinical Representation
+        bert[BioClinicalBERT Encoder]:::model
+        head[Linear Classification Head]:::model
+        bert --> |CLS Embedding| head
+        head --> |Disease Category & Confidence| flow
+    end
+
+    db --> |Raw Discharge Summary| bert
+
+    %% Reasoning Layer
+    subgraph Multi-Agent Reasoning Pipeline
+        flow((SequentialAgentFlow<br/>Orchestrator)):::core
+        
+        a1[Summarisation Agent]:::agent
+        a2[Risk Stratification Agent]:::agent
+        a3[Explainability Agent]:::agent
+        a4[Recommendation Agent]:::agent
+        a5[Justification Agent]:::agent
+        a6[Verification Agent<br/>Two-Pass Guardrails]:::agent
+        
+        flow --> a1 --> a2 --> a3 --> a4 --> a5 --> a6
+    end
+
+    %% UI Layer
+    ui_layer[React Frontend & FastAPI Backend<br/>Patient-Friendly Output]:::ui
+
+    a6 --> |Safe, Verified Explanation| ui_layer
+```
 
 1. **Clinical Extraction:** Enriches raw MIMIC-III records with ICD-9 diagnoses and lab events.
 2. **Classification (BioClinicalBERT):** Assigns the note to one of seven disease categories, routing the semantic signal to the orchestrator.
