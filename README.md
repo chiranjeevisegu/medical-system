@@ -1,4 +1,7 @@
 <div align="center">
+  <img src="./screenshot_home.png" alt="MedAI Dashboard Overview" width="100%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+
+  <br /><br />
   
   # 🏥 MedAI: Explainable Multi-Agent Framework for Patient-Centric Medical Report Comprehension
   
@@ -19,12 +22,43 @@ Clinical Natural Language Processing (NLP) has traditionally struggled to bridge
 
 **MedAI** directly addresses this deficiency through an automated, safety-verified, multi-agent generation pipeline. By combining **BioClinicalBERT** (for structured clinical representation) and **FLAN-T5-base** (for generative reasoning) in a structured multi-agent pipeline, the system automatically converts complex MIMIC-III clinical notes into patient-friendly explanations—complete with risk assessment, safe recommendations, and full clinical justification.
 
+---
+
+## 💻 Interactive Web Interface
+
+We have built a comprehensive, real-time web interface to interact with the multi-agent system. The dashboard provides deep insights into the reasoning process of each specialized agent, live metrics, and visual architecture flows.
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><b>🏥 Home & Analysis Dashboard</b><br/><i>Interactive submission of discharge summaries with real-time, step-by-step agent outputs.</i></td>
+      <td align="center"><b>🏗️ Multi-Agent Architecture View</b><br/><i>Visual breakdown of the hybrid pipeline and inter-agent communication flow.</i></td>
+    </tr>
+    <tr>
+      <td><img src="./screenshot_home.png" alt="Home Dashboard" width="100%" /></td>
+      <td><img src="./screenshot_architecture.png" alt="Architecture View" width="100%" /></td>
+    </tr>
+    <tr>
+      <td align="center"><b>📊 Performance Metrics & Evaluation</b><br/><i>Comprehensive analytics on safety, consistency, classification F1, and readability improvements.</i></td>
+      <td align="center"><b>ℹ️ About the Project</b><br/><i>Detailed documentation on the motivation, clinical significance, and methodology.</i></td>
+    </tr>
+    <tr>
+      <td><img src="./screenshot_metrics.png" alt="Metrics View" width="100%" /></td>
+      <td><img src="./screenshot_about.png" alt="About View" width="100%" /></td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## ✨ Key Features & Capabilities
 
 - 🧬 **Clinical NLP & Grounding:** Uses BioClinicalBERT fine-tuned on MIMIC-III discharge summaries for structured clinical fact extraction, ICD-9 enrichment, and 7-class disease classification.
-- 🤖 **Multi-Agent Reasoning:** Leverages FLAN-T5 to power six specialized agents: Summarisation, Explainability, Risk Stratification, Recommendation, Justification, and Verification.
+- 🤖 **Multi-Agent Reasoning:** Leverages FLAN-T5 to power six specialized agents: **Summarisation**, **Explainability**, **Risk Stratification**, **Recommendation**, **Justification**, and **Verification**.
 - 🛡️ **Safety-First Design (Zero Violations):** Every recommendation is filtered through strict *no-diagnose / no-prescribe* rules. A dedicated Two-Pass Verification Agent checks cross-agent consistency and applies Confidence-Gating.
 - 📊 **Semantic Evaluation:** Evaluated on Flesch-Kincaid Grade Level (FKGL) readability improvement, BioClinicalBERT semantic QA cosine similarity, and Clinical Fact Consistency Rates.
+
+---
 
 ## 🏗️ System Architecture
 
@@ -76,14 +110,16 @@ graph TD
 3. **SequentialAgentFlow (FLAN-T5):** Coordinates the six purpose-built agents.
 4. **Verification & Guardrails:** Ensures no unsafe clinical assertions reach the end user.
 
+---
+
 ## 🚀 Performance Metrics
 
 Evaluated on genuine MIMIC-III ICU discharge summaries, the multi-agent pipeline significantly outperforms a matched single-prompt FLAN-T5-base baseline:
 
-- **Safety:** **0.0%** Unsafe Recommendation Rate (eliminating the 12.9% baseline violation rate).
-- **Consistency:** **100%** Inter-agent clinical fact consistency.
-- **Classification:** **0.852** Weighted-average F1 across 7 disease categories.
-- **Information Preservation:** Retains **73.3%** of clinically relevant findings with a Semantic QA alignment score of **0.763**.
+- 🛡️ **Safety:** **0.0%** Unsafe Recommendation Rate (eliminating the 12.9% baseline violation rate).
+- 🔗 **Consistency:** **100%** Inter-agent clinical fact consistency.
+- 🎯 **Classification:** **0.852** Weighted-average F1 across 7 disease categories.
+- 🧠 **Information Preservation:** Retains **73.3%** of clinically relevant findings with a Semantic QA alignment score of **0.763**.
 
 ### FKGL Readability Improvement
 
@@ -95,23 +131,27 @@ The Explainability Agent successfully lowers the reading difficulty of discharge
   <em>Figure: FKGL reading grade level reduction (mean Δ = -4.18 grade levels) across MIMIC-III discharge summaries. Lower values indicate greater accessibility.</em>
 </div>
 
-## 💻 Technology Stack
+---
 
-### Backend
+## 🛠️ Technology Stack
+
+### ⚙️ Backend
 - **Framework:** FastAPI, Uvicorn
 - **AI/ML:** PyTorch, HuggingFace Transformers (`emilyalsentzer/Bio_ClinicalBERT`, `google/flan-t5-base`)
 - **Data Processing:** Pandas, NumPy
 
-### Frontend
+### 🖥️ Frontend
 - **Framework:** React.js, React Router
 - **Visualization:** Recharts (Radar, Grouped Bar Charts)
 - **Styling:** Vanilla CSS (Custom Design System, Dark/Light semantics)
 
-## 🛠️ Local Setup & Installation
+---
+
+## ⚡ Local Setup & Installation
 
 ### 1. Prerequisites
-- Python 3.12+
-- Node.js & npm
+- **Python 3.12+**
+- **Node.js & npm**
 - Local Hugging Face model cache (downloaded `google/flan-t5-base` and `emilyalsentzer/Bio_ClinicalBERT`)
 
 ### 2. Backend Setup
